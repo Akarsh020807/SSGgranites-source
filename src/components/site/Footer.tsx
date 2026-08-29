@@ -8,12 +8,14 @@ export function Footer() {
     <footer className="bg-ink text-background">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 lg:grid-cols-3 lg:px-8">
         <div>
-          <img
-            src={logoAsset.url}
-            alt="SSG Granites logo"
-            className="h-16 w-auto rounded-sm"
-          />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-background/60">
+          <div className="inline-flex items-center justify-center rounded-lg bg-background/10 p-3 ring-1 ring-primary/30">
+            <img
+              src={logoAsset.url}
+              alt="SSG Granites logo"
+              className="h-24 w-auto rounded-sm"
+            />
+          </div>
+          <p className="mt-5 max-w-xs text-sm leading-relaxed text-background/60">
             Integrated granite mining, processing &amp; export — Black Galaxy, Steel Grey and Black
             Pearl, straight from our own quarry.
           </p>
