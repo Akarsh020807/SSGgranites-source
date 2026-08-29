@@ -1,12 +1,18 @@
 import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
 
+import logoAsset from "@/assets/logo.jpeg.asset.json";
+
 export function Footer() {
   return (
     <footer className="bg-ink text-background">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 lg:grid-cols-3 lg:px-8">
         <div>
-          <p className="font-display text-2xl tracking-[0.18em]">SSG GRANITES</p>
+          <img
+            src={logoAsset.url}
+            alt="SSG Granites logo"
+            className="h-16 w-auto rounded-sm"
+          />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-background/60">
             Integrated granite mining, processing &amp; export — Black Galaxy, Steel Grey and Black
             Pearl, straight from our own quarry.
