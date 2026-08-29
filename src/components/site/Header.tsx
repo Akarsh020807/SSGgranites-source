@@ -12,18 +12,20 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
-        <Link to="/" className="group flex items-center gap-3">
-          <img
-            src={logoAsset.url}
-            alt="SSG Granites logo"
-            className="h-12 w-auto rounded-sm"
-          />
+      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-5 lg:px-8">
+        <Link to="/" className="group flex items-center gap-4">
+          <div className="flex items-center justify-center rounded-lg bg-secondary p-2 ring-1 ring-border/60 shadow-sm">
+            <img
+              src={logoAsset.url}
+              alt="SSG Granites logo"
+              className="h-16 w-auto rounded-sm"
+            />
+          </div>
           <span className="flex flex-col leading-none">
-            <span className="font-display text-2xl tracking-[0.18em] text-foreground">
+            <span className="font-display text-3xl tracking-[0.16em] text-foreground">
               SSG GRANITES
             </span>
-            <span className="mt-1 text-[0.6rem] uppercase tracking-[0.3em] text-primary">
+            <span className="mt-1.5 text-[0.7rem] uppercase tracking-[0.28em] text-primary">
               Mine · Process · Export
             </span>
           </span>
