@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { Menu, Phone, X } from "lucide-react";
 import { useState } from "react";
 
+import logoAsset from "@/assets/logo.jpeg.asset.json";
+
 const linkBase =
   "text-sm font-medium tracking-wide text-foreground transition-colors hover:text-primary";
 
@@ -11,12 +13,19 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
-        <Link to="/" className="group flex flex-col leading-none">
-          <span className="font-display text-2xl tracking-[0.18em] text-foreground">
-            SSG GRANITES
-          </span>
-          <span className="mt-1 text-[0.6rem] uppercase tracking-[0.3em] text-primary">
-            Mine · Process · Export
+        <Link to="/" className="group flex items-center gap-3">
+          <img
+            src={logoAsset.url}
+            alt="SSG Granites logo"
+            className="h-12 w-auto rounded-sm"
+          />
+          <span className="flex flex-col leading-none">
+            <span className="font-display text-2xl tracking-[0.18em] text-foreground">
+              SSG GRANITES
+            </span>
+            <span className="mt-1 text-[0.6rem] uppercase tracking-[0.3em] text-primary">
+              Mine · Process · Export
+            </span>
           </span>
         </Link>
 
