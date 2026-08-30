@@ -22,7 +22,7 @@ export const products: Product[] = [
     description:
       "Black Galaxy is our signature stone, quarried at our own captive mine and processed end to end in our facility. Its jet-black base is scattered with fine golden and bronze mineral flecks that catch light beautifully once polished. Exceptionally dense and hard-wearing, it resists staining and scratching, which is why it remains a first choice for kitchen countertops, feature flooring and exterior cladding worldwide. Because the blocks come from our own quarry, we can hold colour and fleck consistency tight across large orders.",
     image: blackGalaxy,
-    finishes: ["Polished", "\n", "\n", "\n"],
+    finishes: ["Polished"],
     applications: ["Countertops", "Flooring", "Wall Cladding", "Monuments"],
   },
   {
