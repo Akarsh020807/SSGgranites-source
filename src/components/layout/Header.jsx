@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Menu, Phone, X } from "lucide-react";
 import { useState } from "react";
 
-import logoAsset from "@/assets/logo.jpeg.asset.json";
+import logoAsset from "@/assets/logo-new.jpeg.asset.json";
 import { navLinks, site } from "@/data/site";
 
 const linkBase =
@@ -19,7 +19,7 @@ export function Header() {
             <img src={logoAsset.url} alt="SSG Granites logo" className="h-16 w-auto rounded-sm" />
           </div>
           <span className="flex flex-col leading-none">
-            <span className="font-display text-3xl tracking-[0.16em] text-foreground">
+            <span className="font-display text-3xl font-bold uppercase tracking-[0.3em] text-foreground">
               {site.name}
             </span>
             <span className="mt-1.5 text-[0.7rem] uppercase tracking-[0.28em] text-primary">
