@@ -20,22 +20,31 @@ import { useState, type FormEvent } from "react";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { Reveal } from "@/components/site/Reveal";
-import { products } from "@/lib/products";
+import { collection, flagship, products } from "@/lib/products";
+import { countryCodes } from "@/lib/country-codes";
+import { site } from "@/lib/site";
 import heroSlabs from "@/assets/hero-slabs.jpg";
 import quarry from "@/assets/quarry.jpg";
 import cutting from "@/assets/cutting.jpg";
 import polishing from "@/assets/polishing.jpg";
 import exportYard from "@/assets/export.jpg";
+import quality from "@/assets/quality.jpg";
 import blackGalaxy from "@/assets/black-galaxy.jpg";
+import leader1 from "@/assets/leader-1.jpg";
+import leader2 from "@/assets/leader-2.jpg";
+import leader3 from "@/assets/leader-3.jpg";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    product: typeof search.product === "string" ? search.product : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "SSG Granites — Black Galaxy Granite from Our Own Mine" },
       {
         name: "description",
         content:
-          "SSG Granites mines, processes and exports premium Black Galaxy, Steel Grey and Black Pearl granite slabs — an integrated quarry-to-market operation.",
+          "SSG Granites mines, processes and exports premium Black Galaxy granite plus a full collection of Indian granite varieties — an integrated quarry-to-market operation.",
       },
       { property: "og:title", content: "SSG Granites — Black Galaxy Granite from Our Own Mine" },
       {
@@ -43,6 +52,8 @@ export const Route = createFileRoute("/")({
         content:
           "Integrated granite mining, cutting, polishing and export. Premium Black Galaxy slabs direct from source.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -50,17 +61,48 @@ export const Route = createFileRoute("/")({
 
 const stats = [
   { icon: Mountain, title: "Captive Mining Operations", text: "Rough blocks from our own quarry" },
-  { icon: Gem, title: "3 Premium Varieties", text: "Black Galaxy, Steel Grey, Black Pearl" },
+  { icon: Gem, title: "13 Granite Varieties", text: "Black Galaxy plus a full Indian collection" },
   { icon: Globe2, title: "Domestic & Export Reach", text: "Supplying India and overseas markets" },
   { icon: Layers, title: "Quarry-to-Market Model", text: "One chain, block to polished slab" },
 ];
 
 const steps = [
-  { icon: Mountain, title: "Mining & Block Sourcing", text: "Rough blocks extracted at our own mine." },
-  { icon: Scissors, title: "Cutting & Processing", text: "Blocks sized and sawn into slabs in-house." },
-  { icon: Sparkles, title: "Polishing & Finishing", text: "Polished, honed, leathered or flamed." },
-  { icon: BadgeCheck, title: "Quality Selection", text: "Slabs graded for colour and consistency." },
-  { icon: Ship, title: "Distribution & Export", text: "Packed and shipped domestic or overseas." },
+  {
+    icon: Mountain,
+    title: "Mining & Block Sourcing",
+    text: "Rough blocks extracted at our own mine.",
+    image: quarry,
+  },
+  {
+    icon: Scissors,
+    title: "Cutting & Processing",
+    text: "Blocks sized and sawn into slabs in-house.",
+    image: cutting,
+  },
+  {
+    icon: Sparkles,
+    title: "Polishing & Finishing",
+    text: "Polished, honed, leathered or flamed.",
+    image: polishing,
+  },
+  {
+    icon: BadgeCheck,
+    title: "Quality Selection",
+    text: "Slabs graded for colour and consistency.",
+    image: quality,
+  },
+  {
+    icon: Ship,
+    title: "Loading & Export",
+    text: "Packed and shipped domestic or overseas.",
+    image: exportYard,
+  },
+];
+
+const leaders = [
+  { name: "[Owner Name]", role: "Founder & Managing Director", image: leader1 },
+  { name: "[Owner Name]", role: "Director of Operations", image: leader2 },
+  { name: "[Owner Name]", role: "Head of Exports", image: leader3 },
 ];
 
 const gallery = [
@@ -86,6 +128,7 @@ function Home() {
       <main>
         <Hero />
         <About />
+        <Leadership />
         <Process />
         <Range />
         <Gallery />
@@ -96,6 +139,45 @@ function Home() {
     </div>
   );
 }
+
+function Leadership() {
+  return (
+    <section className="bg-secondary py-24 lg:py-32">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <Reveal className="max-w-2xl">
+          <p className="eyebrow">Meet the Team</p>
+          <h2 className="mt-4 text-4xl sm:text-5xl">Leadership</h2>
+          <p className="mt-4 text-base text-muted-foreground">
+            The people behind our quarry, our processing lines and every container that leaves the
+            yard.
+          </p>
+        </Reveal>
+
+        <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {leaders.map((l, i) => (
+            <Reveal key={l.role} delay={i * 100}>
+              <article className="h-full border border-border bg-background p-8 text-center">
+                <img
+                  src={l.image}
+                  alt={`${l.role} at SSG Granites`}
+                  loading="lazy"
+                  width={768}
+                  height={768}
+                  className="mx-auto size-40 rounded-full object-cover ring-1 ring-primary/40"
+                />
+                <h3 className="mt-6 text-2xl font-semibold text-foreground">{l.name}</h3>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                  {l.role}
+                </p>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 function Hero() {
   return (
