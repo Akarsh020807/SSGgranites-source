@@ -354,6 +354,7 @@ function WhyUs() {
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const { product } = Route.useSearch();
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -383,7 +384,27 @@ function Contact() {
             <form onSubmit={onSubmit} className="grid gap-5">
               <div className="grid gap-5 sm:grid-cols-2">
                 <input required name="name" placeholder="Name" className={field} />
-                <input required name="phone" placeholder="Phone Number" className={field} />
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
+                  <select
+                    name="countryCode"
+                    defaultValue="+91"
+                    aria-label="Country code"
+                    className="border border-background/20 bg-ink px-2 py-3 text-sm text-background focus:border-primary focus:outline-none"
+                  >
+                    {countryCodes.map((c) => (
+                      <option key={c.code + c.label} value={c.code} className="bg-ink">
+                        {c.flag} {c.code}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    required
+                    name="phone"
+                    type="tel"
+                    placeholder="Phone Number"
+                    className={field}
+                  />
+                </div>
               </div>
               <input
                 required
@@ -396,7 +417,9 @@ function Contact() {
                 required
                 name="message"
                 rows={5}
-                placeholder="Comments / Message"
+                key={product ?? "blank"}
+                defaultValue={product ? `Enquiry about ${product} — ` : ""}
+                placeholder="Requirement / Queries — stone, finish, sizes, quantity or any question"
                 className={field}
               />
               <button
@@ -419,17 +442,15 @@ function Contact() {
                 <Phone className="mt-1 size-5 text-primary" />
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-background/40">Phone</p>
-                  <a href="tel:+919000000000" className="text-base hover:text-primary">
-                    +91 90000 00000
-                  </a>
+                  <p className="text-base text-background/80">{site.phone}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <Mail className="mt-1 size-5 text-primary" />
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-background/40">Email</p>
-                  <a href="mailto:sales@ssggranites.com" className="text-base hover:text-primary">
-                    sales@ssggranites.com
+                  <a href={site.emailHref} className="text-base hover:text-primary">
+                    {site.email}
                   </a>
                 </div>
               </div>
@@ -438,11 +459,11 @@ function Contact() {
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-background/40">Address</p>
                   <p className="text-base leading-relaxed text-background/80">
-                    Processing Unit &amp; Quarry Office,
-                    <br />
-                    Chimakurthy, Prakasam District,
-                    <br />
-                    Andhra Pradesh, India
+                    {site.addressLines.map((line) => (
+                      <span key={line} className="block">
+                        {line}
+                      </span>
+                    ))}
                   </p>
                 </div>
               </div>
@@ -459,3 +480,4 @@ function Contact() {
     </section>
   );
 }
+
