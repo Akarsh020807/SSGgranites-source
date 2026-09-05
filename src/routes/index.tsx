@@ -20,22 +20,31 @@ import { useState, type FormEvent } from "react";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { Reveal } from "@/components/site/Reveal";
-import { products } from "@/lib/products";
+import { collection, flagship, products } from "@/lib/products";
+import { countryCodes } from "@/lib/country-codes";
+import { site } from "@/lib/site";
 import heroSlabs from "@/assets/hero-slabs.jpg";
 import quarry from "@/assets/quarry.jpg";
 import cutting from "@/assets/cutting.jpg";
 import polishing from "@/assets/polishing.jpg";
 import exportYard from "@/assets/export.jpg";
+import quality from "@/assets/quality.jpg";
 import blackGalaxy from "@/assets/black-galaxy.jpg";
+import leader1 from "@/assets/leader-1.jpg";
+import leader2 from "@/assets/leader-2.jpg";
+import leader3 from "@/assets/leader-3.jpg";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    product: typeof search.product === "string" ? search.product : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "SSG Granites — Black Galaxy Granite from Our Own Mine" },
       {
         name: "description",
         content:
-          "SSG Granites mines, processes and exports premium Black Galaxy, Steel Grey and Black Pearl granite slabs — an integrated quarry-to-market operation.",
+          "SSG Granites mines, processes and exports premium Black Galaxy granite plus a full collection of Indian granite varieties — an integrated quarry-to-market operation.",
       },
       { property: "og:title", content: "SSG Granites — Black Galaxy Granite from Our Own Mine" },
       {
@@ -43,6 +52,8 @@ export const Route = createFileRoute("/")({
         content:
           "Integrated granite mining, cutting, polishing and export. Premium Black Galaxy slabs direct from source.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -50,17 +61,48 @@ export const Route = createFileRoute("/")({
 
 const stats = [
   { icon: Mountain, title: "Captive Mining Operations", text: "Rough blocks from our own quarry" },
-  { icon: Gem, title: "3 Premium Varieties", text: "Black Galaxy, Steel Grey, Black Pearl" },
+  { icon: Gem, title: "13 Granite Varieties", text: "Black Galaxy plus a full Indian collection" },
   { icon: Globe2, title: "Domestic & Export Reach", text: "Supplying India and overseas markets" },
   { icon: Layers, title: "Quarry-to-Market Model", text: "One chain, block to polished slab" },
 ];
 
 const steps = [
-  { icon: Mountain, title: "Mining & Block Sourcing", text: "Rough blocks extracted at our own mine." },
-  { icon: Scissors, title: "Cutting & Processing", text: "Blocks sized and sawn into slabs in-house." },
-  { icon: Sparkles, title: "Polishing & Finishing", text: "Polished, honed, leathered or flamed." },
-  { icon: BadgeCheck, title: "Quality Selection", text: "Slabs graded for colour and consistency." },
-  { icon: Ship, title: "Distribution & Export", text: "Packed and shipped domestic or overseas." },
+  {
+    icon: Mountain,
+    title: "Mining & Block Sourcing",
+    text: "Rough blocks extracted at our own mine.",
+    image: quarry,
+  },
+  {
+    icon: Scissors,
+    title: "Cutting & Processing",
+    text: "Blocks sized and sawn into slabs in-house.",
+    image: cutting,
+  },
+  {
+    icon: Sparkles,
+    title: "Polishing & Finishing",
+    text: "Polished, honed, leathered or flamed.",
+    image: polishing,
+  },
+  {
+    icon: BadgeCheck,
+    title: "Quality Selection",
+    text: "Slabs graded for colour and consistency.",
+    image: quality,
+  },
+  {
+    icon: Ship,
+    title: "Loading & Export",
+    text: "Packed and shipped domestic or overseas.",
+    image: exportYard,
+  },
+];
+
+const leaders = [
+  { name: "[Owner Name]", role: "Founder & Managing Director", image: leader1 },
+  { name: "[Owner Name]", role: "Director of Operations", image: leader2 },
+  { name: "[Owner Name]", role: "Head of Exports", image: leader3 },
 ];
 
 const gallery = [
@@ -86,6 +128,7 @@ function Home() {
       <main>
         <Hero />
         <About />
+        <Leadership />
         <Process />
         <Range />
         <Gallery />
@@ -96,6 +139,45 @@ function Home() {
     </div>
   );
 }
+
+function Leadership() {
+  return (
+    <section className="bg-secondary py-24 lg:py-32">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <Reveal className="max-w-2xl">
+          <p className="eyebrow">Meet the Team</p>
+          <h2 className="mt-4 text-4xl sm:text-5xl">Leadership</h2>
+          <p className="mt-4 text-base text-muted-foreground">
+            The people behind our quarry, our processing lines and every container that leaves the
+            yard.
+          </p>
+        </Reveal>
+
+        <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {leaders.map((l, i) => (
+            <Reveal key={l.role} delay={i * 100}>
+              <article className="h-full border border-border bg-background p-8 text-center">
+                <img
+                  src={l.image}
+                  alt={`${l.role} at SSG Granites`}
+                  loading="lazy"
+                  width={768}
+                  height={768}
+                  className="mx-auto size-40 rounded-full object-cover ring-1 ring-primary/40"
+                />
+                <h3 className="mt-6 text-2xl font-semibold text-foreground">{l.name}</h3>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                  {l.role}
+                </p>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 function Hero() {
   return (
@@ -210,15 +292,25 @@ function Process() {
         <div className="mt-16 grid gap-6 md:grid-cols-3 lg:grid-cols-5">
           {steps.map((step, i) => (
             <Reveal key={step.title} delay={i * 90}>
-              <div className="group h-full border border-border bg-background p-7 transition-colors hover:border-primary">
-                <div className="flex items-center justify-between">
-                  <step.icon className="size-6 text-primary" strokeWidth={1.4} />
-                  <span className="font-display text-3xl text-border transition-colors group-hover:text-primary">
-                    0{i + 1}
-                  </span>
+              <div className="group flex h-full flex-col border border-border bg-background transition-colors hover:border-primary">
+                <img
+                  src={step.image}
+                  alt={step.title}
+                  loading="lazy"
+                  width={1024}
+                  height={768}
+                  className="h-36 w-full object-cover"
+                />
+                <div className="flex flex-1 flex-col p-7">
+                  <div className="flex items-center justify-between">
+                    <step.icon className="size-6 text-primary" strokeWidth={1.4} />
+                    <span className="font-display text-3xl text-border transition-colors group-hover:text-primary">
+                      0{i + 1}
+                    </span>
+                  </div>
+                  <h3 className="mt-6 text-lg leading-snug">{step.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{step.text}</p>
                 </div>
-                <h3 className="mt-6 text-lg leading-snug">{step.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{step.text}</p>
               </div>
             </Reveal>
           ))}
@@ -229,12 +321,14 @@ function Process() {
 }
 
 function Range() {
-  const [flagship, ...rest] = products;
+  const preview = collection.slice(0, 4);
   return (
     <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8 lg:py-32">
       <Reveal className="max-w-2xl">
         <p className="eyebrow">Our Granite Range</p>
-        <h2 className="mt-4 text-4xl sm:text-5xl">Three stones, one dark-granite family</h2>
+        <h2 className="mt-4 text-4xl sm:text-5xl">
+          {products.length} granite varieties, one integrated supply chain
+        </h2>
       </Reveal>
 
       <div className="mt-14 grid gap-8 lg:grid-cols-2">
@@ -242,8 +336,8 @@ function Range() {
           <article className="group h-full border border-border bg-background">
             <div className="overflow-hidden">
               <img
-                src={flagship!.image}
-                alt={flagship!.name}
+                src={flagship.image}
+                alt={flagship.name}
                 loading="lazy"
                 width={1024}
                 height={768}
@@ -254,11 +348,11 @@ function Range() {
               <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
                 Flagship Product
               </span>
-              <h3 className="mt-3 text-3xl">{flagship!.name}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{flagship!.short}</p>
+              <h3 className="mt-3 text-3xl">{flagship.name}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{flagship.short}</p>
               <Link
-                to="/products"
-                hash={flagship!.slug}
+                to="/products/$slug"
+                params={{ slug: flagship.slug }}
                 className="mt-6 inline-block border-b border-primary pb-1 text-xs font-semibold uppercase tracking-[0.18em] text-foreground transition-colors hover:text-primary"
               >
                 View Details
@@ -267,39 +361,49 @@ function Range() {
           </article>
         </Reveal>
 
-        <div className="grid gap-8">
-          {rest.map((p, i) => (
+        <div className="grid gap-6 sm:grid-cols-2">
+          {preview.map((p, i) => (
             <Reveal key={p.slug} delay={i * 100}>
-              <article className="group flex h-full flex-col border border-border bg-secondary sm:flex-row">
-                <div className="overflow-hidden sm:w-2/5">
+              <Link
+                to="/products/$slug"
+                params={{ slug: p.slug }}
+                className="group flex h-full flex-col border border-border bg-secondary"
+              >
+                <div className="overflow-hidden">
                   <img
                     src={p.image}
                     alt={p.name}
                     loading="lazy"
                     width={1024}
                     height={768}
-                    className="h-52 w-full object-cover transition-transform duration-700 group-hover:scale-105 sm:h-full"
+                    className="h-40 w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                 </div>
-                <div className="flex flex-1 flex-col justify-center p-7">
-                  <h3 className="text-2xl">{p.name}</h3>
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="text-xl">{p.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.short}</p>
-                  <Link
-                    to="/products"
-                    hash={p.slug}
-                    className="mt-5 inline-block self-start border-b border-primary pb-1 text-xs font-semibold uppercase tracking-[0.18em] text-foreground transition-colors hover:text-primary"
-                  >
+                  <span className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
                     View Details
-                  </Link>
+                  </span>
                 </div>
-              </article>
+              </Link>
             </Reveal>
           ))}
         </div>
       </div>
+
+      <Reveal>
+        <Link
+          to="/products"
+          className="mt-12 inline-block bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown"
+        >
+          View All Products
+        </Link>
+      </Reveal>
     </section>
   );
 }
+
 
 function Gallery() {
   return (
@@ -354,6 +458,7 @@ function WhyUs() {
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const { product } = Route.useSearch();
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -383,7 +488,27 @@ function Contact() {
             <form onSubmit={onSubmit} className="grid gap-5">
               <div className="grid gap-5 sm:grid-cols-2">
                 <input required name="name" placeholder="Name" className={field} />
-                <input required name="phone" placeholder="Phone Number" className={field} />
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
+                  <select
+                    name="countryCode"
+                    defaultValue="+91"
+                    aria-label="Country code"
+                    className="border border-background/20 bg-ink px-2 py-3 text-sm text-background focus:border-primary focus:outline-none"
+                  >
+                    {countryCodes.map((c) => (
+                      <option key={c.code + c.label} value={c.code} className="bg-ink">
+                        {c.flag} {c.code}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    required
+                    name="phone"
+                    type="tel"
+                    placeholder="Phone Number"
+                    className={field}
+                  />
+                </div>
               </div>
               <input
                 required
@@ -396,7 +521,9 @@ function Contact() {
                 required
                 name="message"
                 rows={5}
-                placeholder="Comments / Message"
+                key={product ?? "blank"}
+                defaultValue={product ? `Enquiry about ${product} — ` : ""}
+                placeholder="Requirement / Queries — stone, finish, sizes, quantity or any question"
                 className={field}
               />
               <button
@@ -419,17 +546,15 @@ function Contact() {
                 <Phone className="mt-1 size-5 text-primary" />
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-background/40">Phone</p>
-                  <a href="tel:+919000000000" className="text-base hover:text-primary">
-                    +91 90000 00000
-                  </a>
+                  <p className="text-base text-background/80">{site.phone}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <Mail className="mt-1 size-5 text-primary" />
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-background/40">Email</p>
-                  <a href="mailto:sales@ssggranites.com" className="text-base hover:text-primary">
-                    sales@ssggranites.com
+                  <a href={site.emailHref} className="text-base hover:text-primary">
+                    {site.email}
                   </a>
                 </div>
               </div>
@@ -438,11 +563,11 @@ function Contact() {
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-background/40">Address</p>
                   <p className="text-base leading-relaxed text-background/80">
-                    Processing Unit &amp; Quarry Office,
-                    <br />
-                    Chimakurthy, Prakasam District,
-                    <br />
-                    Andhra Pradesh, India
+                    {site.addressLines.map((line) => (
+                      <span key={line} className="block">
+                        {line}
+                      </span>
+                    ))}
                   </p>
                 </div>
               </div>
@@ -459,3 +584,4 @@ function Contact() {
     </section>
   );
 }
+
