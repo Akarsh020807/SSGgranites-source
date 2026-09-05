@@ -21,7 +21,7 @@ export const countryCodes = [
   { code: "+7", flag: "🇷🇺", label: "Russia" },
   { code: "+27", flag: "🇿🇦", label: "South Africa" },
   { code: "+55", flag: "🇧🇷", label: "Brazil" },
-  { code: "+1-CA", flag: "🇨🇦", label: "Canada" },
+  { code: "+1", flag: "🇨🇦", label: "Canada" },
   { code: "+64", flag: "🇳🇿", label: "New Zealand" },
   { code: "+94", flag: "🇱🇰", label: "Sri Lanka" },
   { code: "+880", flag: "🇧🇩", label: "Bangladesh" },
