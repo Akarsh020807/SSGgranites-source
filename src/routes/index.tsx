@@ -105,8 +105,9 @@ const steps = [
 ];
 
 const founder = {
-  name: "[Owner Name]",
+  name: "Buchepalli Rilasa Reddy",
   role: "Founder & Managing Director",
+  designation: "Owner & Managing Director",
   image: leader1,
   quote:
     "Steering SSG Granites from the quarry face to international markets with an unwavering focus on raw block consistency, state-of-the-art Italian polishing, and factory-direct export value.",
@@ -149,13 +150,16 @@ function Home() {
 
 function Leadership() {
   return (
-    <section className="bg-secondary py-24 lg:py-32 border-y border-border">
+    <section className="relative overflow-hidden bg-gradient-to-b from-secondary/80 via-background to-secondary/40 py-24 lg:py-32 border-y border-border">
+      {/* Subtle stone quarry radial background glow */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <Reveal>
             <p className="eyebrow">Executive Leadership</p>
             <h2 className="mt-3 text-4xl sm:text-5xl font-light text-foreground">
-              Founder &amp; Managing Director
+              Guiding Vision &amp; Ownership
             </h2>
             <p className="mt-4 text-base text-muted-foreground leading-relaxed">
               Driving captive quarry operations, raw block consistency, and direct international
@@ -164,33 +168,60 @@ function Leadership() {
           </Reveal>
         </div>
 
-        <div className="mx-auto mt-12 max-w-xl">
+        <div className="mx-auto mt-12 max-w-2xl">
           <Reveal delay={100}>
-            <article className="border border-border bg-background p-8 sm:p-12 text-center shadow-lg transition-all hover:border-primary/50">
-              <div className="relative mx-auto size-44 overflow-hidden rounded-full ring-2 ring-primary/40 shadow-inner bg-ink/10">
+            <article className="relative overflow-hidden rounded-xl border border-primary/30 bg-background p-8 sm:p-12 text-center shadow-2xl transition-all duration-300 hover:border-primary/60 hover:shadow-primary/10">
+              {/* Corner accent badge */}
+              <div className="absolute top-0 right-0 h-28 w-28 translate-x-10 -translate-y-10 rotate-45 bg-primary/10 border-b border-primary/20" />
+
+              {/* Portrait */}
+              <div className="relative mx-auto size-44 sm:size-48 overflow-hidden rounded-full ring-4 ring-primary/40 shadow-2xl bg-ink/10">
                 <img
                   src={founder.image}
-                  alt={`${founder.role} at SSG Granites`}
+                  alt={`${founder.name} — ${founder.role} at SSG Granites`}
                   loading="lazy"
                   width={768}
                   height={768}
-                  className="size-full object-cover"
+                  className="size-full object-cover transition-transform duration-500 hover:scale-105"
                 />
               </div>
-              <h3 className="mt-6 text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
+
+              {/* Executive Role Pills */}
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
+                <span className="inline-flex items-center rounded-full border border-primary/50 bg-primary/10 px-4 py-1 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-primary shadow-sm">
+                  Owner &amp; Managing Director
+                </span>
+                <span className="inline-flex items-center rounded-full border border-border bg-secondary px-3.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wider text-muted-foreground">
+                  SSG Granites
+                </span>
+              </div>
+
+              {/* Powerful, Solid Executive Name Typography */}
+              <h3 className="mt-4 font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground uppercase">
                 {founder.name}
               </h3>
-              <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+
+              {/* Gold Divider Accent */}
+              <div className="mx-auto mt-3 h-0.5 w-20 bg-primary" />
+
+              <p className="mt-3 text-xs font-semibold uppercase tracking-[0.28em] text-primary/90">
                 {founder.role}
               </p>
-              <div className="mx-auto mt-6 max-w-md border-t border-border/70 pt-6">
-                <p className="text-sm italic text-muted-foreground leading-relaxed">
+
+              {/* Executive Vision Statement */}
+              <div className="mx-auto mt-6 max-w-lg border-t border-border/80 pt-6">
+                <p className="text-sm sm:text-base italic text-muted-foreground leading-relaxed font-serif">
                   &ldquo;{founder.quote}&rdquo;
                 </p>
               </div>
-              <div className="mt-6 flex flex-wrap justify-center gap-2">
+
+              {/* Verified Operational Badges */}
+              <div className="mt-6 flex flex-wrap justify-center gap-2 pt-2">
                 <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/5 px-4 py-1 text-[0.7rem] font-semibold uppercase tracking-wider text-primary">
                   Captive Quarry Operations • Chimakurthy, AP
+                </span>
+                <span className="inline-flex items-center rounded-full border border-border bg-secondary/70 px-4 py-1 text-[0.7rem] font-medium tracking-wide text-foreground/80">
+                  Mine-to-Market Export Oversight
                 </span>
               </div>
             </article>
