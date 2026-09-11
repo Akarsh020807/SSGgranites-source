@@ -194,17 +194,19 @@ function Leadership() {
                   <div className="relative group">
                     {/* Golden luxury outer frame */}
                     <div className="relative overflow-hidden rounded-xl border border-[#C5A880]/40 p-2 bg-[#171513] shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-                      <div className="overflow-hidden rounded-lg aspect-[3/4] w-64 sm:w-72">
+                      <div className="relative overflow-hidden rounded-lg aspect-[3/4] w-64 sm:w-72 bg-white">
                         <img
                           src={founder.image}
                           alt={`${founder.name} — Owner & Managing Director`}
                           loading="lazy"
-                          width={768}
+                          width={786}
                           height={1024}
-                          className="size-full object-cover object-top filter contrast-[1.03] transition-transform duration-700 group-hover:scale-105"
+                          className="size-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                         />
+                        {/* Soft studio feathering & fine inner border */}
+                        <div className="absolute inset-0 rounded-lg pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.12)] ring-1 ring-inset ring-black/10" />
                       </div>
-                      <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-white/10 pointer-events-none" />
+                      <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-[#C5A880]/20 pointer-events-none" />
                     </div>
 
                     {/* Engraved Plaque */}
