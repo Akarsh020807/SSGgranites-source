@@ -1,28 +1,35 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Anchor,
+  ArrowRight,
   BadgeCheck,
+  CheckCircle2,
   Gem,
   Globe2,
   Layers,
+  Loader2,
   Mail,
   MapPin,
   Mountain,
   Phone,
   Scissors,
+  Send,
   Ship,
   Sparkles,
   Tag,
   Truck,
 } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { Reveal } from "@/components/site/Reveal";
+import { useAuth } from "@/context/AuthContext";
 import { collection, flagship, products } from "@/lib/products";
 import { countryCodes } from "@/lib/country-codes";
 import { site } from "@/lib/site";
+import { supabase } from "@/lib/supabase";
 import heroSlabs from "@/assets/hero-slabs.jpg";
 import quarry from "@/assets/quarry.jpg";
 import cutting from "@/assets/cutting.jpg";
@@ -203,12 +210,20 @@ function Hero() {
             An integrated mining-to-export operation: we extract our own rough blocks, cut, polish
             and grade them in-house, and ship finished slabs to buyers across India and overseas.
           </p>
-          <Link
-            to="/products"
-            className="mt-10 inline-flex items-center gap-3 bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown"
-          >
-            Explore Our Granite
-          </Link>
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <Link
+              to="/products"
+              className="inline-flex items-center gap-3 bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown shadow-md"
+            >
+              Explore Our Granite
+            </Link>
+            <Link
+              to="/quote"
+              className="inline-flex items-center gap-3 border border-background/40 bg-background/10 backdrop-blur-sm px-8 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-background transition-colors hover:bg-background hover:text-foreground"
+            >
+              Get a Quote (RFQ)
+            </Link>
+          </div>
         </Reveal>
       </div>
     </section>
@@ -457,87 +472,305 @@ function WhyUs() {
 }
 
 function Contact() {
-  const [sent, setSent] = useState(false);
   const { product } = Route.useSearch();
+  const { isAdmin } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [submittedLead, setSubmittedLead] = useState<{
+    name: string;
+    variety: string;
+    email: string;
+  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  // Form states
+  const [name, setName] = useState("");
+  const [countryCode, setCountryCode] = useState("+91");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [stoneVariety, setStoneVariety] = useState(product || "Black Galaxy");
+  const [requirementType, setRequirementType] = useState("Gang-saw Slabs (20mm / 30mm)");
+  const [quantity, setQuantity] = useState("1 Container (~4,500 sq.ft)");
+  const [message, setMessage] = useState(
+    product ? `Requesting quotation, slab photos and container availability for ${product}.` : ""
+  );
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSent(true);
-    e.currentTarget.reset();
+    if (submitting) return;
+
+    setError(null);
+    setSubmitting(true);
+
+    try {
+      const fullPhone = `${countryCode} ${phone.trim()}`;
+      const subject = `[${stoneVariety}] ${requirementType}`;
+      const detailedMessage = `Requirement: ${requirementType}\nGranite: ${stoneVariety}\nEstimated Volume: ${quantity}\n\nClient Specifications:\n${message.trim()}`;
+
+      const { error: insertError } = await supabase.from("leads").insert({
+        name: name.trim(),
+        email: email.trim(),
+        phone: fullPhone,
+        subject,
+        message: detailedMessage,
+        source: "Website",
+        status: "New",
+        priority: "Normal",
+      });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      setSubmittedLead({
+        name: name.trim(),
+        variety: stoneVariety,
+        email: email.trim(),
+      });
+      toast.success("Enquiry submitted successfully! Stored in Supabase.");
+    } catch (err: any) {
+      console.error("Submission failed:", err);
+      setError(err?.message || "Failed to submit enquiry. Please check your details and try again.");
+      toast.error("Submission error: " + (err?.message || "Failed to save enquiry"));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function resetForm() {
+    setSubmittedLead(null);
+    setName("");
+    setPhone("");
+    setEmail("");
+    setMessage("");
   }
 
   const field =
-    "w-full border border-background/20 bg-transparent px-4 py-3 text-sm text-background placeholder:text-background/40 focus:border-primary focus:outline-none";
+    "w-full border border-background/20 bg-background/5 px-4 py-3 text-sm text-background placeholder:text-background/40 focus:border-primary focus:outline-none transition-colors";
 
   return (
     <section id="contact" className="scroll-mt-20 bg-ink py-24 text-background lg:py-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal className="max-w-2xl">
-          <p className="eyebrow">Contact Us</p>
+          <p className="eyebrow">Direct Quarry & Trade Enquiry</p>
           <h2 className="mt-4 text-4xl text-background sm:text-5xl">
             Tell us what you need — slab, container or project volume
           </h2>
           <p className="mt-4 text-base text-background/60">
             Domestic enquiries and export or bulk orders are equally welcome. Share your sizes,
-            finishes and quantities and our team will revert with pricing and availability.
+            finishes and quantities and our sales desk will revert with pricing and availability.
           </p>
         </Reveal>
 
-        <div className="mt-14 grid gap-14 lg:grid-cols-[1.2fr_1fr]">
+        <div className="mt-14 grid gap-14 lg:grid-cols-[1.3fr_1fr]">
           <Reveal>
-            <form onSubmit={onSubmit} className="grid gap-5">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <input required name="name" placeholder="Name" className={field} />
-                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
-                  <select
-                    name="countryCode"
-                    defaultValue="+91"
-                    aria-label="Country code"
-                    className="border border-background/20 bg-ink px-2 py-3 text-sm text-background focus:border-primary focus:outline-none"
+            {submittedLead ? (
+              /* Success State with Link to Leads Tab */
+              <div className="border border-primary/40 bg-background/5 p-8 sm:p-10 text-background">
+                <div className="flex size-12 items-center justify-center rounded-full bg-primary/20 text-primary">
+                  <CheckCircle2 className="size-7" />
+                </div>
+                <h3 className="mt-5 text-2xl font-semibold text-background">
+                  Enquiry Successfully Recorded!
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-background/70">
+                  Thank you, <strong className="text-primary">{submittedLead.name}</strong>. Your requirement
+                  for <strong className="text-primary">{submittedLead.variety}</strong> has been received. Our export sales desk will review your specifications and reach out via WhatsApp / phone shortly.
+                </p>
+                <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-background/15 pt-6">
+                  {isAdmin ? (
+                    <Link
+                      to="/leads"
+                      className="inline-flex items-center gap-2 bg-primary px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-brown"
+                    >
+                      View in Leads CRM (Admin)
+                      <ArrowRight className="size-3.5" />
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/products"
+                      className="inline-flex items-center gap-2 bg-primary px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-brown"
+                    >
+                      Explore Granite Slabs
+                      <ArrowRight className="size-3.5" />
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="border border-background/20 px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-background/80 transition-colors hover:bg-background/10 hover:text-background cursor-pointer"
                   >
-                    {countryCodes.map((c) => (
-                      <option key={c.code + c.label} value={c.code} className="bg-ink">
-                        {c.flag} {c.code}
-                      </option>
-                    ))}
-                  </select>
+                    Submit Another Enquiry
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Enquiry Form */
+              <form onSubmit={onSubmit} className="grid gap-5">
+                {error && (
+                  <div className="border border-red-500/30 bg-red-500/10 p-4 text-xs text-red-400">
+                    {error}
+                  </div>
+                )}
+
+                {/* Name & Phone */}
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-background/70">
+                      Full Name *
+                    </label>
+                    <input
+                      required
+                      name="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. Robert Smith / Sharma Trading"
+                      className={field}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-background/70">
+                      Phone / WhatsApp *
+                    </label>
+                    <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
+                      <select
+                        name="countryCode"
+                        value={countryCode}
+                        onChange={(e) => setCountryCode(e.target.value)}
+                        aria-label="Country code"
+                        className="border border-background/20 bg-ink px-2 py-3 text-sm text-background focus:border-primary focus:outline-none"
+                      >
+                        {countryCodes.map((c) => (
+                          <option key={c.code + c.label} value={c.code} className="bg-ink">
+                            {c.flag} {c.code}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        required
+                        name="phone"
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="e.g. 9876543210"
+                        className={field}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Email Address */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-background/70">
+                    Email Address *
+                  </label>
                   <input
                     required
-                    name="phone"
-                    type="tel"
-                    placeholder="Phone Number"
+                    type="email"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="e.g. procurement@company.com"
                     className={field}
                   />
                 </div>
-              </div>
-              <input
-                required
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                className={field}
-              />
-              <textarea
-                required
-                name="message"
-                rows={5}
-                key={product ?? "blank"}
-                defaultValue={product ? `Enquiry about ${product} — ` : ""}
-                placeholder="Requirement / Queries — stone, finish, sizes, quantity or any question"
-                className={field}
-              />
-              <button
-                type="submit"
-                className="justify-self-start bg-primary px-9 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown"
-              >
-                Send Enquiry
-              </button>
-              {sent && (
-                <p className="text-sm text-primary">
-                  Thank you — your enquiry has been received. Our team will get back to you shortly.
-                </p>
-              )}
-            </form>
+
+                {/* Granite Variety & Requirement Type */}
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-background/70">
+                      Granite Variety *
+                    </label>
+                    <select
+                      value={stoneVariety}
+                      onChange={(e) => setStoneVariety(e.target.value)}
+                      className="w-full border border-background/20 bg-ink px-4 py-3 text-sm text-background focus:border-primary focus:outline-none"
+                    >
+                      <option value="Black Galaxy (Captive Mine)">Black Galaxy (Own Mine - Flagship)</option>
+                      <option value="Steel Grey">Steel Grey</option>
+                      <option value="Black Pearl">Black Pearl</option>
+                      <option value="Tan Brown">Tan Brown</option>
+                      <option value="Absolute Black">Absolute Black</option>
+                      <option value="Viscont White">Viscont White</option>
+                      <option value="Colonial White">Colonial White</option>
+                      <option value="Other / Mixed Consignment">Other / Multi-variety Order</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-background/70">
+                      Order / Processing Type
+                    </label>
+                    <select
+                      value={requirementType}
+                      onChange={(e) => setRequirementType(e.target.value)}
+                      className="w-full border border-background/20 bg-ink px-4 py-3 text-sm text-background focus:border-primary focus:outline-none"
+                    >
+                      <option value="Gang-saw Slabs (20mm / 30mm)">Gang-saw Polished Slabs (20mm/30mm)</option>
+                      <option value="Cutter Slabs">Cutter Slabs</option>
+                      <option value="Export Container Order (FOB/CIF)">Export Container Order (FOB/CIF)</option>
+                      <option value="Cut-to-Size / Commercial Project">Cut-to-Size / Commercial Project</option>
+                      <option value="Rough Blocks">Rough Blocks Direct from Mine</option>
+                      <option value="General Technical & Pricing Query">General Enquiry & Price List</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Estimated Quantity */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-background/70">
+                    Estimated Quantity / Volume
+                  </label>
+                  <input
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    placeholder="e.g. 1 Container (~4,500 sq.ft) or 500 sq.ft or 2 Rough Blocks"
+                    className={field}
+                  />
+                </div>
+
+                {/* Message / Specifications */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-background/70">
+                    Project Specifications / Comments *
+                  </label>
+                  <textarea
+                    required
+                    name="message"
+                    rows={4}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Provide details such as finishes (Polished, Honed, Leathered, Flamed), destination port, slab sizes, or specific delivery timelines..."
+                    className={field}
+                  />
+                </div>
+
+                {/* Submit CTA */}
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="inline-flex items-center gap-2.5 bg-primary px-9 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" />
+                        Saving to Supabase...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="size-3.5" />
+                        Send Enquiry Now
+                      </>
+                    )}
+                  </button>
+
+                  <span className="text-xs text-background/50">
+                    Direct entry to our CRM and quarry export team.
+                  </span>
+                </div>
+              </form>
+            )}
           </Reveal>
 
           <Reveal delay={120}>
@@ -576,6 +809,23 @@ function Contact() {
                 <p className="text-sm text-background/60">
                   Factory and quarry visits welcome by appointment.
                 </p>
+              </div>
+
+              <div className="space-y-2.5 pt-2">
+                <Link
+                  to="/quote"
+                  className="flex items-center justify-between border border-primary/40 bg-primary/10 p-4 text-xs font-semibold uppercase tracking-wider text-primary hover:bg-primary/20 transition-colors"
+                >
+                  <span>Interactive Quote &amp; Container Estimator</span>
+                  <ArrowRight className="size-4" />
+                </Link>
+                <Link
+                  to="/contact"
+                  className="flex items-center justify-between border border-background/20 bg-background/5 p-4 text-xs font-semibold uppercase tracking-wider text-background/80 hover:bg-background/10 hover:text-background transition-colors"
+                >
+                  <span>Quarry Visit &amp; Travel Guide</span>
+                  <ArrowRight className="size-4" />
+                </Link>
               </div>
             </div>
           </Reveal>

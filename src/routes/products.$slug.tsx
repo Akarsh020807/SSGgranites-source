@@ -176,14 +176,21 @@ function ProductDetail() {
                     {product.positioning.join(" • ")}
                   </p>
                 </div>
-                <Link
-                  to="/"
-                  search={{ product: product.name }}
-                  hash="contact"
-                  className="block bg-primary px-8 py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown"
-                >
-                  Enquire Now
-                </Link>
+                <div className="space-y-3">
+                  <Link
+                    to="/quote"
+                    search={{ product: product.slug }}
+                    className="block bg-primary px-8 py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown shadow-sm"
+                  >
+                    Request Quotation (RFQ)
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="block border border-border bg-background px-8 py-3.5 text-center text-xs font-semibold uppercase tracking-[0.16em] text-foreground transition-colors hover:bg-muted"
+                  >
+                    Contact / Quarry Visit
+                  </Link>
+                </div>
               </aside>
             </Reveal>
           </div>

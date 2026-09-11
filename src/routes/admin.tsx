@@ -1,9 +1,9 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Loader2, LogOut, Menu, Inbox, Settings, ShieldAlert } from "lucide-react";
+import { Globe, Inbox, LayoutDashboard, Loader2, LogOut, Menu, ShieldAlert } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import { useAdminSession } from "@/hooks/useAdminSession";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
@@ -14,19 +14,20 @@ export const Route = createFileRoute("/admin")({
 });
 
 const nav = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/admin/leads", label: "Leads", icon: Inbox, exact: false },
-  { to: "/admin/settings", label: "Settings", icon: Settings, exact: false },
+  { to: "/leads", label: "Leads Management", icon: Inbox, exact: true },
+  { to: "/admin", label: "Admin Overview", icon: LayoutDashboard, exact: true },
+  { to: "/", label: "Storefront (User View)", icon: Globe, exact: true },
 ] as const;
 
 function AdminLayout() {
-  const { loading, session, isAdmin } = useAdminSession();
+  const { loading, session, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
 
-  async function signOut() {
-    await supabase.auth.signOut();
+  async function handleSignOut() {
+    await signOut();
+    toast.success("Signed out");
     navigate({ to: "/admin/login", replace: true });
   }
 
@@ -50,15 +51,20 @@ function AdminLayout() {
   if (!isAdmin) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/40 px-5">
-        <div className="max-w-md border border-border bg-background p-8 text-center">
+        <div className="max-w-md border border-border bg-background p-8 text-center shadow-sm">
           <ShieldAlert className="mx-auto size-8 text-destructive" />
-          <h1 className="mt-4 text-xl font-semibold">Access denied</h1>
+          <h1 className="mt-4 text-xl font-semibold">Access Denied</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            This account isn't authorised to view enquiry data.
+            This account ({session.user.email}) is not authorised to view administrative enquiry records.
           </p>
-          <Button className="mt-6" onClick={signOut}>
-            Sign out
-          </Button>
+          <div className="mt-6 flex flex-col gap-2">
+            <Button onClick={handleSignOut} variant="destructive">
+              Sign out &amp; Switch Account
+            </Button>
+            <Button onClick={() => navigate({ to: "/" })} variant="outline">
+              Return to Storefront
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -70,7 +76,7 @@ function AdminLayout() {
         <p className="font-display text-base font-semibold uppercase tracking-[0.18em]">
           SSG Granites
         </p>
-        <p className="mt-0.5 text-xs text-muted-foreground">Lead management</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">Administration</p>
       </div>
       <ul className="flex-1 space-y-1 p-3">
         {nav.map((item) => {
@@ -97,8 +103,8 @@ function AdminLayout() {
       <div className="border-t border-border p-3">
         <p className="truncate px-3 pb-2 text-xs text-muted-foreground">{session.user.email}</p>
         <button
-          onClick={signOut}
-          className="flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          onClick={handleSignOut}
+          className="flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
         >
           <LogOut className="size-4" />
           Logout

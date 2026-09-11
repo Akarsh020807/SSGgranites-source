@@ -2,7 +2,7 @@ import { Mail, MapPin, Phone, Truck } from "lucide-react";
 import { useState } from "react";
 
 import { Reveal } from "@/components/layout/Reveal";
-import { submitEnquiry } from "@/backend/contact.functions";
+import { createLead } from "@/services/leadService";
 import { site } from "@/data/site";
 
 const field =
@@ -10,17 +10,37 @@ const field =
 
 export function ContactSection() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   async function onSubmit(e) {
     e.preventDefault();
+
+    if (sending) return;
+
     const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form).entries());
-    form.reset();
-    setSent(true);
+    const formData = new FormData(form);
+    const payload = {
+      name: String(formData.get("name") || "").trim(),
+      phone: String(formData.get("phone") || "").trim(),
+      email: String(formData.get("email") || "").trim(),
+      message: String(formData.get("message") || "").trim(),
+    };
+
+    setSent(false);
+    setError("");
+    setSending(true);
+
     try {
-      await submitEnquiry({ data });
-    } catch (error) {
-      console.error(error);
+      await createLead(payload);
+
+      form.reset();
+      setSent(true);
+    } catch (err) {
+      console.error("Failed to submit enquiry:", err);
+      setError("We couldn't send your enquiry. Please try again.");
+    } finally {
+      setSending(false);
     }
   }
 
@@ -61,15 +81,17 @@ export function ContactSection() {
               />
               <button
                 type="submit"
-                className="justify-self-start bg-primary px-9 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown"
+                disabled={sending}
+                className="justify-self-start bg-primary px-9 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Send Enquiry
+                {sending ? "Sending..." : "Send Enquiry"}
               </button>
               {sent && (
                 <p className="text-sm text-primary">
                   Thank you — your enquiry has been received. Our team will get back to you shortly.
                 </p>
               )}
+              {error && <p className="text-sm text-red-400">{error}</p>}
             </form>
           </Reveal>
 

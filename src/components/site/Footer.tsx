@@ -1,18 +1,20 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Lock, Mail, MapPin, Phone } from "lucide-react";
 
-import logoAsset from "@/assets/logo.jpeg.asset.json";
+import { useAuth } from "@/context/AuthContext";
 
 export function Footer() {
+  const { isAdmin } = useAuth();
+
   return (
     <footer className="bg-ink text-background">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 lg:grid-cols-3 lg:px-8">
         <div>
           <div className="inline-flex items-center justify-center rounded-lg bg-background/10 p-3 ring-1 ring-primary/30">
             <img
-              src={logoAsset.url}
+              src="/favicon.png"
               alt="SSG Granites logo"
-              className="h-24 w-auto rounded-sm"
+              className="h-16 w-auto rounded-sm object-contain"
             />
           </div>
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-background/60">
@@ -36,9 +38,30 @@ export function Footer() {
                 Products
               </Link>
             </li>
+
+            {/* If Admin is logged in, show the Leads link */}
+            {isAdmin && (
+              <li>
+                <Link
+                  to="/leads"
+                  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+                >
+                  <span>Leads Management</span>
+                  <span className="rounded bg-primary/20 px-1.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-primary">
+                    Admin
+                  </span>
+                </Link>
+              </li>
+            )}
+
             <li>
-              <Link to="/" hash="contact" className="transition-colors hover:text-primary">
-                Contact
+              <Link to="/quote" className="transition-colors hover:text-primary font-medium text-primary/90">
+                Request a Quote (RFQ)
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact" className="transition-colors hover:text-primary">
+                Contact &amp; Plant Visit
               </Link>
             </li>
           </ul>
@@ -86,9 +109,17 @@ export function Footer() {
       </div>
 
       <div className="border-t border-background/10">
-        <p className="mx-auto max-w-7xl px-5 py-5 text-xs text-background/40 lg:px-8">
-          © 2026 SSG Granites. All rights reserved.
-        </p>
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-5 py-5 text-xs text-background/40 sm:flex-row lg:px-8">
+          <p>© 2026 SSG Granites. All rights reserved.</p>
+          <Link
+            to="/admin/login"
+            className="inline-flex items-center gap-1 text-background/30 transition-colors hover:text-background/70"
+            title="Authorized Staff Portal"
+          >
+            <Lock className="size-3" />
+            <span>Staff Portal</span>
+          </Link>
+        </div>
       </div>
     </footer>
   );

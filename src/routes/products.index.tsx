@@ -75,13 +75,22 @@ function ProductsIndex() {
                     {flagship.short} Quarried at our own mine and processed end to end in our
                     facility, which lets us hold colour and fleck consistency across large orders.
                   </p>
-                  <Link
-                    to="/products/$slug"
-                    params={{ slug: flagship.slug }}
-                    className="mt-8 inline-block self-start bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown"
-                  >
-                    View Details
-                  </Link>
+                  <div className="mt-8 flex flex-wrap items-center gap-4">
+                    <Link
+                      to="/products/$slug"
+                      params={{ slug: flagship.slug }}
+                      className="inline-block bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown shadow-sm"
+                    >
+                      View Details
+                    </Link>
+                    <Link
+                      to="/quote"
+                      search={{ product: flagship.slug }}
+                      className="inline-block border border-border bg-background px-7 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-foreground transition-colors hover:bg-secondary"
+                    >
+                      Get a Quote
+                    </Link>
+                  </div>
                 </div>
               </article>
             </Reveal>
@@ -164,6 +173,33 @@ function ProductsIndex() {
               ))}
             </div>
           </Reveal>
+        </section>
+
+        {/* Quote & Contact CTA banner */}
+        <section className="border-t border-border bg-ink py-16 text-background">
+          <div className="mx-auto max-w-7xl px-5 text-center lg:px-8">
+            <h2 className="text-3xl font-light sm:text-4xl text-background">
+              Need Container Pricing or Custom Dimensions?
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-background/70">
+              Configure thicknesses, finishes, and ocean shipping terms in our interactive RFQ estimator,
+              or speak directly with our Chimakurthy quarry directors.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <Link
+                to="/quote"
+                className="bg-primary px-9 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-brown shadow-sm"
+              >
+                Open Quote Builder (RFQ)
+              </Link>
+              <Link
+                to="/contact"
+                className="border border-background/30 bg-transparent px-8 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-background transition-colors hover:bg-background/10"
+              >
+                Contact &amp; Quarry Visit
+              </Link>
+            </div>
+          </div>
         </section>
       </main>
       <Footer />
