@@ -207,17 +207,6 @@ function Leadership() {
                       </div>
                     </div>
                   </div>
-
-                  {/* Operational Location & Reach */}
-                  <div className="mt-8 flex flex-col items-center gap-1">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                      <MapPin className="size-3.5 text-primary" />
-                      Captive Quarry • Chimakurthy, Andhra Pradesh
-                    </span>
-                    <span className="text-[0.7rem] uppercase tracking-wider text-muted-foreground/80">
-                      Export Operations Worldwide
-                    </span>
-                  </div>
                 </div>
 
                 {/* Right Column: Name, Single Title, Vision Quote, and Strategic Pillars */}
