@@ -38,8 +38,6 @@ import exportYard from "@/assets/export.jpg";
 import quality from "@/assets/quality.jpg";
 import blackGalaxy from "@/assets/black-galaxy.jpg";
 import leader1 from "@/assets/leader-1.jpg";
-import leader2 from "@/assets/leader-2.jpg";
-import leader3 from "@/assets/leader-3.jpg";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -106,11 +104,13 @@ const steps = [
   },
 ];
 
-const leaders = [
-  { name: "[Owner Name]", role: "Founder & Managing Director", image: leader1 },
-  { name: "[Owner Name]", role: "Director of Operations", image: leader2 },
-  { name: "[Owner Name]", role: "Head of Exports", image: leader3 },
-];
+const founder = {
+  name: "[Owner Name]",
+  role: "Founder & Managing Director",
+  image: leader1,
+  quote:
+    "Steering SSG Granites from the quarry face to international markets with an unwavering focus on raw block consistency, state-of-the-art Italian polishing, and factory-direct export value.",
+};
 
 const gallery = [
   { src: quarry, alt: "Open-pit black granite quarry", w: 1280, h: 960 },
@@ -149,36 +149,52 @@ function Home() {
 
 function Leadership() {
   return (
-    <section className="bg-secondary py-24 lg:py-32">
+    <section className="bg-secondary py-24 lg:py-32 border-y border-border">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <Reveal className="max-w-2xl">
-          <p className="eyebrow">Meet the Team</p>
-          <h2 className="mt-4 text-4xl sm:text-5xl">Leadership</h2>
-          <p className="mt-4 text-base text-muted-foreground">
-            The people behind our quarry, our processing lines and every container that leaves the
-            yard.
-          </p>
-        </Reveal>
+        <div className="mx-auto max-w-2xl text-center">
+          <Reveal>
+            <p className="eyebrow">Executive Leadership</p>
+            <h2 className="mt-3 text-4xl sm:text-5xl font-light text-foreground">
+              Founder &amp; Managing Director
+            </h2>
+            <p className="mt-4 text-base text-muted-foreground leading-relaxed">
+              Driving captive quarry operations, raw block consistency, and direct international
+              export partnerships.
+            </p>
+          </Reveal>
+        </div>
 
-        <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {leaders.map((l, i) => (
-            <Reveal key={l.role} delay={i * 100}>
-              <article className="h-full border border-border bg-background p-8 text-center">
+        <div className="mx-auto mt-12 max-w-xl">
+          <Reveal delay={100}>
+            <article className="border border-border bg-background p-8 sm:p-12 text-center shadow-lg transition-all hover:border-primary/50">
+              <div className="relative mx-auto size-44 overflow-hidden rounded-full ring-2 ring-primary/40 shadow-inner bg-ink/10">
                 <img
-                  src={l.image}
-                  alt={`${l.role} at SSG Granites`}
+                  src={founder.image}
+                  alt={`${founder.role} at SSG Granites`}
                   loading="lazy"
                   width={768}
                   height={768}
-                  className="mx-auto size-40 rounded-full object-cover ring-1 ring-primary/40"
+                  className="size-full object-cover"
                 />
-                <h3 className="mt-6 text-2xl font-semibold text-foreground">{l.name}</h3>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-                  {l.role}
+              </div>
+              <h3 className="mt-6 text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
+                {founder.name}
+              </h3>
+              <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                {founder.role}
+              </p>
+              <div className="mx-auto mt-6 max-w-md border-t border-border/70 pt-6">
+                <p className="text-sm italic text-muted-foreground leading-relaxed">
+                  &ldquo;{founder.quote}&rdquo;
                 </p>
-              </article>
-            </Reveal>
-          ))}
+              </div>
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
+                <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/5 px-4 py-1 text-[0.7rem] font-semibold uppercase tracking-wider text-primary">
+                  Captive Quarry Operations • Chimakurthy, AP
+                </span>
+              </div>
+            </article>
+          </Reveal>
         </div>
       </div>
     </section>
