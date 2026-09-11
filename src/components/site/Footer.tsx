@@ -74,23 +74,34 @@ export function Footer() {
           <ul className="mt-5 space-y-3 text-sm text-background/70">
             <li className="flex items-start gap-3">
               <Phone className="mt-0.5 size-4 text-primary" />
-              <a href="tel:+919000000000" className="hover:text-primary">
-                +91 90000 00000
+              <a href="tel:+917799999555" className="hover:text-primary transition-colors font-medium">
+                +91 77999 99555
               </a>
             </li>
             <li className="flex items-start gap-3">
               <Mail className="mt-0.5 size-4 text-primary" />
-              <a href="mailto:sales@ssggranites.com" className="hover:text-primary">
-                sales@ssggranites.com
+              <a href="mailto:srisuryagranites5@gmail.com" className="hover:text-primary transition-colors">
+                srisuryagranites5@gmail.com
               </a>
             </li>
             <li className="flex items-start gap-3">
               <MapPin className="mt-0.5 size-4 text-primary" />
-              <span>
-                Processing Unit &amp; Quarry Office,
-                <br />
-                Chimakurthy, Andhra Pradesh, India
-              </span>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Processing+Unit+%26+Quarry+Office,+Chimakurthy,+Andhra+Pradesh,+India"
+                target="_blank"
+                rel="noreferrer"
+                className="group hover:text-primary transition-colors leading-relaxed"
+                title="Open in Google Maps"
+              >
+                <span>
+                  Processing Unit &amp; Quarry Office,
+                  <br />
+                  Chimakurthy, Andhra Pradesh, India
+                </span>
+                <span className="block text-[0.7rem] text-primary mt-1 font-semibold group-hover:underline">
+                  Open in Google Maps ↗
+                </span>
+              </a>
             </li>
           </ul>
           <div className="mt-6 flex gap-3">

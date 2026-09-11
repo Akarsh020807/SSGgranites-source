@@ -779,14 +779,19 @@ function Contact() {
                 <Phone className="mt-1 size-5 text-primary" />
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-background/40">Phone</p>
-                  <p className="text-base text-background/80">{site.phone}</p>
+                  <a
+                    href={site.phoneHref}
+                    className="text-base text-background/80 hover:text-primary transition-colors"
+                  >
+                    {site.phone}
+                  </a>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <Mail className="mt-1 size-5 text-primary" />
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-background/40">Email</p>
-                  <a href={site.emailHref} className="text-base hover:text-primary">
+                  <a href={site.emailHref} className="text-base hover:text-primary transition-colors">
                     {site.email}
                   </a>
                 </div>
@@ -795,13 +800,23 @@ function Contact() {
                 <MapPin className="mt-1 size-5 text-primary" />
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-background/40">Address</p>
-                  <p className="text-base leading-relaxed text-background/80">
+                  <a
+                    href={site.mapsHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group block text-base leading-relaxed text-background/80 hover:text-primary transition-colors cursor-pointer"
+                    title="Open in Google Maps"
+                  >
                     {site.addressLines.map((line) => (
-                      <span key={line} className="block">
+                      <span key={line} className="block group-hover:underline">
                         {line}
                       </span>
                     ))}
-                  </p>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-primary mt-1">
+                      <span>View in Google Maps</span>
+                      <span>↗</span>
+                    </span>
+                  </a>
                 </div>
               </div>
               <div className="flex items-center gap-4 border border-background/15 p-6">

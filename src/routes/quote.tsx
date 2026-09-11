@@ -685,7 +685,7 @@ function QuotePage() {
 
                             <div className="mt-5 flex flex-wrap gap-4">
                               <a
-                                href={`https://wa.me/919000000000?text=Hello%20SSG%20Granites%2C%20I%20have%20submitted%20Quotation%20%23${submittedRfq.id}%20for%20${encodeURIComponent(
+                                href={`https://wa.me/917799999555?text=Hello%20SSG%20Granites%2C%20I%20have%20submitted%20Quotation%20%23${submittedRfq.id}%20for%20${encodeURIComponent(
                                   submittedRfq.product.name,
                                 )}%20(${encodeURIComponent(
                                   submittedRfq.volume.label,
@@ -1364,7 +1364,7 @@ function QuotePage() {
                         {/* Direct Fast-Track Callout */}
                         <div className="mt-6 border-t border-border/70 pt-4">
                           <a
-                            href="https://wa.me/919000000000?text=Hello%20SSG%20Granites%2C%20I%20am%20configuring%20an%20RFQ%20for%20Black%20Galaxy%20granite."
+                            href="https://wa.me/917799999555?text=Hello%20SSG%20Granites%2C%20I%20am%20configuring%20an%20RFQ%20for%20Black%20Galaxy%20granite."
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex w-full items-center justify-center gap-2 bg-emerald-600/10 border border-emerald-600/30 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 hover:bg-emerald-600/20 transition-colors"

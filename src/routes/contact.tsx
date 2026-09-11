@@ -258,9 +258,9 @@ function ContactPage() {
                     Chimakurthy Processing Hub
                   </p>
                   <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-                    R.L. Puram Road, Chimakurthy,
+                    Processing Unit &amp; Quarry Office,
                     <br />
-                    Prakasam District, Andhra Pradesh 523226, India.
+                    Chimakurthy, Andhra Pradesh, India.
                   </p>
 
                   <div className="mt-6 space-y-2 text-xs text-muted-foreground border-t border-border/80 pt-4">
@@ -270,8 +270,8 @@ function ContactPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Phone className="size-3.5 text-primary" />
-                      <a href="tel:+919000000000" className="hover:text-primary transition-colors font-medium">
-                        +91 90000 00000
+                      <a href="tel:+917799999555" className="hover:text-primary transition-colors font-medium">
+                        +91 77999 99555
                       </a>
                     </div>
                   </div>
@@ -279,12 +279,12 @@ function ContactPage() {
 
                 <div className="mt-6 pt-4 border-t border-border/70 flex items-center justify-between">
                   <a
-                    href="https://maps.google.com/?q=Chimakurthy+Andhra+Pradesh"
+                    href="https://www.google.com/maps/search/?api=1&query=Processing+Unit+%26+Quarry+Office,+Chimakurthy,+Andhra+Pradesh,+India"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary hover:underline"
                   >
-                    <span>Google Maps Pin</span>
+                    <span>Open in Google Maps</span>
                     <ExternalLink className="size-3" />
                   </a>
                   <span className="text-[0.65rem] uppercase font-bold text-muted-foreground">
@@ -365,7 +365,7 @@ function ContactPage() {
 
                 <div className="mt-6 pt-4 border-t border-border/70 flex items-center justify-between">
                   <a
-                    href="https://wa.me/919000000000?text=Hello%20SSG%20Granites%2C%20I%20am%20interested%20in%20commercial%20granite%20supply"
+                    href="https://wa.me/917799999555?text=Hello%20SSG%20Granites%2C%20I%20am%20interested%20in%20commercial%20granite%20supply"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 hover:underline"
@@ -499,7 +499,7 @@ function ContactPage() {
                           Submit Another Request
                         </button>
                         <a
-                          href="https://wa.me/919000000000?text=Hello%20SSG%20Granites%2C%20I%20have%20submitted%20a%20factory%20visit%20request%20on%20your%20portal."
+                          href="https://wa.me/917799999555?text=Hello%20SSG%20Granites%2C%20I%20have%20submitted%20a%20factory%20visit%20request%20on%20your%20portal."
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center gap-2 bg-emerald-600 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-white hover:bg-emerald-700 transition-colors"
