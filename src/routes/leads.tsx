@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
-  Archive,
   ArrowLeft,
   ArrowUpDown,
   Calendar,
@@ -28,7 +27,6 @@ import {
   Phone,
   PhoneCall,
   RefreshCw,
-  RotateCcw,
   Search,
   Send,
   ShieldAlert,
@@ -259,24 +257,23 @@ function LeadsPage() {
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [lastSynced, setLastSynced] = useState<Date>(new Date());
-  
+
   // Controls
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [varietyFilter, setVarietyFilter] = useState<string>("All Varieties");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest" | "priority">("newest");
   const [viewMode, setViewMode] = useState<"dossier" | "table">("dossier");
-  
+
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   // CRM Internal Notes state (stored per lead id in localStorage)
   const [leadNotes, setLeadNotes] = useState<Record<string, string>>({});
   const [expandedNoteId, setExpandedNoteId] = useState<string | null>(null);
 
-  // Archive & Delete controls
+  // Delete modal controls
   const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
-  const [viewArchived, setViewArchived] = useState(false);
 
   // Load saved notes from localStorage
   useEffect(() => {
@@ -308,26 +305,23 @@ function LeadsPage() {
   const [loginBusy, setLoginBusy] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  // Fetch leads whenever verified admin status is active or viewArchived changes
+  // Fetch leads whenever verified admin status is active
   useEffect(() => {
     if (isAdmin) {
-      fetchLeads(false, viewArchived);
+      fetchLeads(false);
     }
-  }, [isAdmin, viewArchived]);
+  }, [isAdmin]);
 
-  async function fetchLeads(showToast = false, archived = viewArchived) {
+  async function fetchLeads(showToast = false) {
     try {
       if (showToast) setRefreshing(true);
       else setLoadingLeads(true);
 
-      let query = supabase.from("leads").select("*");
-      if (archived) {
-        query = query.not("deleted_at", "is", null);
-      } else {
-        query = query.is("deleted_at", null);
-      }
-
-      const { data, error } = await query.order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("leads")
+        .select("*")
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false });
 
       if (error) {
         throw error;
@@ -373,28 +367,7 @@ function LeadsPage() {
     }
   }
 
-  async function handleArchive(leadId: string, name: string) {
-    try {
-      setDeleteBusy(true);
-      const { error } = await supabase
-        .from("leads")
-        .update({ deleted_at: new Date().toISOString() })
-        .eq("id", leadId);
-
-      if (error) throw error;
-
-      setLeads((prev) => prev.filter((l) => l.id !== leadId));
-      setLeadToDelete(null);
-      toast.success(`Enquiry from ${name} moved to archive`);
-    } catch (err: any) {
-      console.error("Archive error:", err);
-      toast.error("Failed to archive: " + err.message);
-    } finally {
-      setDeleteBusy(false);
-    }
-  }
-
-  async function handlePermanentDelete(leadId: string, name: string) {
+  async function handleDeleteLead(leadId: string, name: string) {
     try {
       setDeleteBusy(true);
       const { error } = await supabase
@@ -406,32 +379,12 @@ function LeadsPage() {
 
       setLeads((prev) => prev.filter((l) => l.id !== leadId));
       setLeadToDelete(null);
-      toast.success(`Enquiry from ${name} permanently deleted`);
+      toast.success(`Enquiry from ${name} deleted successfully`);
     } catch (err: any) {
-      console.error("Permanent delete error:", err);
+      console.error("Delete error:", err);
       toast.error("Failed to delete enquiry: " + err.message);
     } finally {
       setDeleteBusy(false);
-    }
-  }
-
-  async function handleRestore(leadId: string, name: string) {
-    try {
-      setUpdatingId(leadId);
-      const { error } = await supabase
-        .from("leads")
-        .update({ deleted_at: null })
-        .eq("id", leadId);
-
-      if (error) throw error;
-
-      setLeads((prev) => prev.filter((l) => l.id !== leadId));
-      toast.success(`Enquiry from ${name} restored to active pipeline`);
-    } catch (err: any) {
-      console.error("Restore error:", err);
-      toast.error("Failed to restore enquiry: " + err.message);
-    } finally {
-      setUpdatingId(null);
     }
   }
 
@@ -675,43 +628,16 @@ function LeadsPage() {
 
               {/* Utility Actions Cluster: Export, View Switcher & Sync */}
               <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-                {/* Active vs Archived Toggle */}
-                <div className="inline-flex rounded-xl border border-[#D6C4A5]/70 bg-white p-1 shadow-2xs">
-                  <button
-                    type="button"
-                    onClick={() => setViewArchived(false)}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-                      !viewArchived
-                        ? "bg-primary text-white shadow-xs"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <span>Active Enquiries</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewArchived(true)}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-                      viewArchived
-                        ? "bg-amber-600 text-white shadow-xs"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <Archive className="size-3.5" />
-                    <span>Archived</span>
-                  </button>
-                </div>
 
                 {/* View Switcher: Dossier Cards vs Data Table */}
                 <div className="inline-flex rounded-xl border border-[#D6C4A5]/70 bg-white p-1 shadow-2xs">
                   <button
                     type="button"
                     onClick={() => setViewMode("dossier")}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-                      viewMode === "dossier"
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${viewMode === "dossier"
                         ? "bg-primary text-white shadow-xs"
                         : "text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                     title="Dossier Cards View"
                   >
                     <LayoutList className="size-3.5" />
@@ -720,11 +646,10 @@ function LeadsPage() {
                   <button
                     type="button"
                     onClick={() => setViewMode("table")}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-                      viewMode === "table"
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${viewMode === "table"
                         ? "bg-primary text-white shadow-xs"
                         : "text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                     title="Data Table View"
                   >
                     <TableIcon className="size-3.5" />
@@ -891,17 +816,15 @@ function LeadsPage() {
                   <button
                     key={s.id}
                     onClick={() => setStatusFilter(s.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all cursor-pointer ${
-                      statusFilter === s.id
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all cursor-pointer ${statusFilter === s.id
                         ? "bg-primary text-white font-semibold shadow-xs"
                         : "border border-border/70 bg-[#FAF8F5] text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <span>{s.label}</span>
                     <span
-                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                        statusFilter === s.id ? "bg-white/25 text-white" : "bg-white border border-border text-muted-foreground"
-                      }`}
+                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${statusFilter === s.id ? "bg-white/25 text-white" : "bg-white border border-border text-muted-foreground"
+                        }`}
                     >
                       {s.count}
                     </span>
@@ -919,11 +842,10 @@ function LeadsPage() {
                     key={v}
                     type="button"
                     onClick={() => setVarietyFilter(v)}
-                    className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition-all cursor-pointer ${
-                      varietyFilter === v
+                    className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition-all cursor-pointer ${varietyFilter === v
                         ? "bg-brown text-white shadow-2xs font-semibold"
                         : "border border-border/60 bg-white text-muted-foreground hover:border-primary hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     {v}
                   </button>
@@ -1082,45 +1004,14 @@ function LeadsPage() {
                                 >
                                   <Mail className="size-4" />
                                 </a>
-                                {viewArchived ? (
-                                  <>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleRestore(lead.id, lead.name)}
-                                      className="rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
-                                      title="Restore to Active Pipeline"
-                                    >
-                                      <RotateCcw className="size-4" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => setLeadToDelete(lead)}
-                                      className="rounded-lg p-1.5 text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-                                      title="Permanently Delete Record"
-                                    >
-                                      <Trash2 className="size-4" />
-                                    </button>
-                                  </>
-                                ) : (
-                                  <>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleArchive(lead.id, lead.name)}
-                                      className="rounded-lg p-1.5 text-muted-foreground hover:text-amber-800 hover:bg-amber-500/10 transition-colors cursor-pointer"
-                                      title="Archive Enquiry"
-                                    >
-                                      <Archive className="size-4" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => setLeadToDelete(lead)}
-                                      className="rounded-lg p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-                                      title="Delete Enquiry Permanently"
-                                    >
-                                      <Trash2 className="size-4" />
-                                    </button>
-                                  </>
-                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => setLeadToDelete(lead)}
+                                  className="rounded-lg p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                                  title="Delete Enquiry"
+                                >
+                                  <Trash2 className="size-4" />
+                                </button>
                               </div>
                             </td>
                           </tr>
@@ -1417,50 +1308,17 @@ function LeadsPage() {
                               </a>
                             </div>
 
-                            {/* Archive / Delete Action */}
-                            <div className="pt-2 border-t border-border/60 flex items-center justify-between text-xs">
-                              <span className="text-[11px] text-muted-foreground font-medium">Record Control</span>
-                              {viewArchived ? (
-                                <div className="flex items-center gap-1.5">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRestore(lead.id, lead.name)}
-                                    className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-emerald-700 transition-colors cursor-pointer"
-                                  >
-                                    <RotateCcw className="size-3" />
-                                    <span>Restore</span>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => setLeadToDelete(lead)}
-                                    className="inline-flex items-center gap-1 rounded-lg bg-destructive/10 px-2.5 py-1 text-[11px] font-semibold text-destructive hover:bg-destructive hover:text-white transition-colors cursor-pointer"
-                                  >
-                                    <Trash2 className="size-3" />
-                                    <span>Delete</span>
-                                  </button>
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-1.5">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleArchive(lead.id, lead.name)}
-                                    title="Move enquiry to archive"
-                                    className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-2.5 py-1 text-[11px] font-medium text-muted-foreground hover:border-[#DECDB3] hover:text-foreground transition-colors cursor-pointer"
-                                  >
-                                    <Archive className="size-3 text-muted-foreground" />
-                                    <span>Archive</span>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => setLeadToDelete(lead)}
-                                    title="Delete enquiry permanently"
-                                    className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer"
-                                  >
-                                    <Trash2 className="size-3" />
-                                    <span>Delete</span>
-                                  </button>
-                                </div>
-                              )}
+                            {/* Delete Action */}
+                            <div className="pt-2 border-t border-border/60 flex items-center justify-end text-xs">
+                              <button
+                                type="button"
+                                onClick={() => setLeadToDelete(lead)}
+                                title="Delete enquiry"
+                                className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer"
+                              >
+                                <Trash2 className="size-3.5" />
+                                <span>Delete</span>
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -1510,35 +1368,23 @@ function LeadsPage() {
               </div>
 
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Are you sure you want to permanently delete this enquiry? Once deleted, this commercial record cannot be recovered.
+                Are you sure you want to permanently delete this enquiry? This action cannot be undone.
               </p>
 
-              <div className="pt-3 border-t border-border/80 flex flex-wrap items-center justify-end gap-2">
+              <div className="pt-3 border-t border-border/80 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   disabled={deleteBusy}
                   onClick={() => setLeadToDelete(null)}
-                  className="rounded-xl border border-border px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-secondary cursor-pointer transition-colors"
+                  className="rounded-xl border border-border px-4 py-2 text-xs font-semibold text-foreground hover:bg-secondary cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
 
-                {!viewArchived && (
-                  <button
-                    type="button"
-                    disabled={deleteBusy}
-                    onClick={() => handleArchive(leadToDelete.id, leadToDelete.name)}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-[#DECDB3] bg-white px-3.5 py-2 text-xs font-semibold text-[#8C6D3B] hover:bg-[#FAF8F5] cursor-pointer transition-colors"
-                  >
-                    <Archive className="size-3.5" />
-                    <span>Archive Instead</span>
-                  </button>
-                )}
-
                 <button
                   type="button"
                   disabled={deleteBusy}
-                  onClick={() => handlePermanentDelete(leadToDelete.id, leadToDelete.name)}
+                  onClick={() => handleDeleteLead(leadToDelete.id, leadToDelete.name)}
                   className="inline-flex items-center gap-1.5 rounded-xl bg-destructive px-4 py-2 text-xs font-semibold text-white hover:bg-destructive/90 cursor-pointer transition-colors disabled:opacity-50"
                 >
                   {deleteBusy ? (
@@ -1546,7 +1392,7 @@ function LeadsPage() {
                   ) : (
                     <Trash2 className="size-3.5" />
                   )}
-                  <span>Permanently Delete</span>
+                  <span>Delete</span>
                 </button>
               </div>
             </div>
