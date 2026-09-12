@@ -18,15 +18,12 @@ import {
   MapPin,
   MessageSquare,
   Mountain,
-  Navigation,
   Phone,
-  Plane,
   Radio,
   Send,
   ShieldCheck,
   Ship,
   Sparkles,
-  Train,
   Truck,
   Users,
 } from "lucide-react";
@@ -138,7 +135,7 @@ function ContactPage() {
       return;
     }
 
-    if (!fullName.trim() || !email.trim() || !phone.trim() || !message.trim()) {
+    if (!fullName.trim() || !email.trim() || !phone.trim() || (formType !== "visit" && !message.trim())) {
       toast.error("Please fill in all required contact details.");
       return;
     }
@@ -153,7 +150,7 @@ function ContactPage() {
         `Company / Firm: ${companyName.trim() || "Not specified"}`,
         formType === "visit" && visitDate ? `Requested Visit Date: ${visitDate}` : null,
         formType === "visit" ? `Visiting Delegation Size: ${delegateCount}` : null,
-        `\nMessage / Specific Requirements:\n${message.trim()}`,
+        message.trim() ? `\nMessage / Specific Requirements:\n${message.trim()}` : null,
       ]
         .filter(Boolean)
         .join("\n");
@@ -601,10 +598,9 @@ function ContactPage() {
                         <div className="grid gap-6 sm:grid-cols-2 bg-secondary/30 p-5 border border-border">
                           <div>
                             <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-foreground/80">
-                              Anticipated Visit Date *
+                              Anticipated Visit Date
                             </label>
                             <input
-                              required
                               type="date"
                               value={visitDate}
                               onChange={(e) => setVisitDate(e.target.value)}
@@ -662,11 +658,11 @@ function ContactPage() {
                       <div>
                         <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-foreground/80">
                           {formType === "visit"
-                            ? "Specific Blocks / Stones you wish to inspect *"
+                            ? "Specific Blocks / Stones you wish to inspect"
                             : "Message / Specific Requirements *"}
                         </label>
                         <textarea
-                          required
+                          required={formType !== "visit"}
                           rows={4}
                           value={message}
                           onChange={(e) => setMessage(e.target.value)}
@@ -711,76 +707,9 @@ function ContactPage() {
                 </Reveal>
               </div>
 
-              {/* Right Column: Travel Logistics & Airport Transfers (5 COLS) */}
+              {/* Right Column: Granite Quotation Estimator (5 COLS) */}
               <div className="lg:col-span-5 space-y-8">
                 <Reveal delay={100}>
-                  <div className="border border-border bg-secondary/40 p-8 shadow-sm">
-                    <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
-                      <Navigation className="size-4" />
-                      <span>Visiting Delegations Guide</span>
-                    </div>
-                    <h3 className="mt-3 text-2xl font-semibold">How to Reach Chimakurthy</h3>
-                    <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                      Chimakurthy is globally recognized as the exclusive geological belt for authentic
-                      Black Galaxy granite. We provide local reception and chauffeur transport for
-                      approved international stone buyers.
-                    </p>
-
-                    <div className="mt-6 space-y-4">
-                      {/* Flights */}
-                      <div className="flex items-start gap-3 border-t border-border/70 pt-4">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded bg-background text-primary">
-                          <Plane className="size-4" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold uppercase tracking-wider text-foreground">
-                            Gateway Airports
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                            <strong className="text-foreground">Vijayawada (VGA)</strong> — 155 km
-                            (~3 hrs via NH-16)
-                            <br />
-                            <strong className="text-foreground">Chennai (MAA)</strong> — 290 km (~5
-                            hrs via NH-16)
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Rail */}
-                      <div className="flex items-start gap-3 border-t border-border/70 pt-4">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded bg-background text-primary">
-                          <Train className="size-4" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold uppercase tracking-wider text-foreground">
-                            Nearest Railway Hub
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                            <strong className="text-foreground">Ongole (OGL)</strong> — 22 km. Main
-                            express trunk line with direct high-speed trains from Chennai, Hyderabad, and
-                            Bangalore.
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Ocean Port */}
-                      <div className="flex items-start gap-3 border-t border-border/70 pt-4">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded bg-background text-primary">
-                          <Ship className="size-4" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold uppercase tracking-wider text-foreground">
-                            Ocean Container Ports
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                            Chennai Port (280 km) &amp; Krishnapatnam Port (170 km). Daily 24-hr dedicated
-                            trailer transit.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Pricing Estimator Callout */}
                   <div className="border border-primary/40 bg-primary/5 p-8 shadow-sm">
                     <p className="text-xs font-bold uppercase tracking-widest text-primary">

@@ -20,7 +20,7 @@ import {
   Tag,
   Truck,
 } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
 import { Footer } from "@/components/site/Footer";
@@ -32,6 +32,9 @@ import { countryCodes } from "@/lib/country-codes";
 import { site } from "@/lib/site";
 import { supabase } from "@/lib/supabase";
 import heroSlabs from "@/assets/hero-slabs.jpg";
+import heroGallery from "@/assets/hero-gallery.jpg";
+import heroShowroom1 from "@/assets/hero-showroom-1.jpg";
+import heroShowroom2 from "@/assets/hero-showroom-2.jpg";
 import quarry from "@/assets/quarry.jpg";
 import cutting from "@/assets/cutting.jpg";
 import polishing from "@/assets/polishing.jpg";
@@ -41,8 +44,8 @@ import blackGalaxy from "@/assets/black-galaxy.jpg";
 import founderPortrait from "@/assets/founder-buchepalli.jpg";
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    product: typeof search.product === "string" ? search.product : undefined,
+  validateSearch: (search: Record<string, unknown>): { product?: string | undefined } => ({
+    product: typeof search["product"] === "string" ? (search["product"] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -67,7 +70,7 @@ export const Route = createFileRoute("/")({
 
 const stats = [
   { icon: Mountain, title: "Captive Mining Operations", text: "Rough blocks from our own quarry" },
-  { icon: Gem, title: "13 Granite Varieties", text: "Black Galaxy plus a full Indian collection" },
+  { icon: Gem, title: "Wide Granite Varieties", text: "Black Galaxy and a full Indian collection" },
   { icon: Globe2, title: "Domestic & Export Reach", text: "Supplying India and overseas markets" },
   { icon: Layers, title: "Quarry-to-Market Model", text: "One chain, block to polished slab" },
 ];
@@ -151,136 +154,163 @@ function Home() {
 
 function Leadership() {
   return (
-    <section className="relative overflow-hidden bg-[#141211] text-[#F3EFEA] py-28 lg:py-36 border-y border-[#2E2A27]">
-      {/* Background architectural ambient glow */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_50%_20%,rgba(169,145,113,0.18),transparent)]" />
-
-      {/* Subtle fine watermark */}
-      <div className="pointer-events-none absolute -left-10 top-1/2 -translate-y-1/2 select-none text-[12rem] font-serif font-bold text-white/[0.02] tracking-widest uppercase">
-        SURYA
-      </div>
+    <section className="relative overflow-hidden bg-[#FAF8F5] text-foreground pt-14 pb-8 sm:pt-16 sm:pb-10 lg:pt-20 lg:pb-12 border-y border-[#EAE3D7]">
+      {/* Warm luxury architectural ambient glow */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_40%_at_50%_15%,rgba(197,168,128,0.18),transparent)]" />
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.025] bg-[radial-gradient(#1A1A1A_1px,transparent_1px)] [background-size:24px_24px]" />
 
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         {/* Editorial Eyebrow & Title */}
         <div className="mx-auto max-w-3xl text-center">
           <Reveal>
-            <div className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-[#C5A880] font-medium">
-              <span className="h-px w-8 bg-[#C5A880]/50" />
+            <div className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-primary font-semibold">
+              <span className="h-px w-10 bg-gradient-to-r from-transparent to-primary" />
               <span>Leadership &amp; Heritage</span>
-              <span className="h-px w-8 bg-[#C5A880]/50" />
+              <span className="h-px w-10 bg-gradient-to-l from-transparent to-primary" />
             </div>
-            <h2 className="mt-4 font-serif text-3xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-[#FAF7F2]">
-              The Visionary Behind the Quarry
+            <h2 className="mt-3 font-display text-2xl sm:text-4xl lg:text-5xl font-light tracking-tight text-foreground">
+              The Vision Behind <span className="font-semibold text-primary">SSG Granites</span>
             </h2>
-            <p className="mt-4 text-sm sm:text-base text-[#B0A79E] leading-relaxed max-w-2xl mx-auto">
-              Spearheading integrated mining, processing, and direct global exports from the heart of Chimakurthy’s Black Galaxy granite belt.
+            <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              Spearheading integrated captive mining, advanced processing, and direct global exports from the heart of Chimakurthy’s Black Galaxy granite belt.
             </p>
           </Reveal>
         </div>
 
-        {/* Master Bespoke Showcase Box */}
-        <div className="mx-auto mt-16 max-w-5xl">
+        {/* Master Showcase Card (compacted by ~2-3 cm) */}
+        <div className="mx-auto mt-10 max-w-5xl">
           <Reveal delay={100}>
-            <div className="relative rounded-2xl border border-[#C5A880]/25 bg-gradient-to-br from-[#1C1A17] to-[#121110] p-8 sm:p-14 shadow-2xl backdrop-blur-xl">
-              {/* Corner Architectural Brackets */}
-              <div className="absolute top-3 left-3 size-4 border-t border-l border-[#C5A880]/40" />
-              <div className="absolute top-3 right-3 size-4 border-t border-r border-[#C5A880]/40" />
-              <div className="absolute bottom-3 left-3 size-4 border-b border-l border-[#C5A880]/40" />
-              <div className="absolute bottom-3 right-3 size-4 border-b border-r border-[#C5A880]/40" />
+            <div className="relative overflow-hidden rounded-3xl border border-[#DECDB3]/80 bg-gradient-to-b from-white via-[#FCFBF9] to-[#FAF8F5] p-6 sm:p-8 lg:p-10 shadow-[0_20px_70px_-15px_rgba(28,25,23,0.08)] ring-1 ring-[#D6C4A5]/25">
+              {/* Top dual-tone gold accent ribbon */}
+              <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary/30 via-primary to-primary/30" />
 
-              <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
-                {/* Left Column: Authentic Executive Portrait Frame */}
+              <div className="grid gap-8 lg:grid-cols-12 lg:gap-10 lg:items-center">
+                {/* Left Column: Modern Executive Portrait in Luxury Gallery Frame */}
                 <div className="lg:col-span-5 flex flex-col items-center">
-                  <div className="relative group">
-                    {/* Golden luxury outer frame */}
-                    <div className="relative overflow-hidden rounded-xl border border-[#C5A880]/40 p-2 bg-[#171513] shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-                      <div className="relative overflow-hidden rounded-lg aspect-[3/4] w-64 sm:w-72 bg-white">
+                  <div className="relative w-full max-w-[270px]">
+                    {/* Double-beveled gallery frame */}
+                    <div className="relative overflow-hidden rounded-2xl border border-[#D8C9AE] bg-gradient-to-b from-[#F7F4EC] to-[#EFE7D8] p-2 shadow-xl group">
+                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-white shadow-inner">
                         <img
                           src={founder.image}
-                          alt={`${founder.name} — Owner & Managing Director`}
+                          alt={`${founder.name} — ${founder.role}`}
                           loading="lazy"
                           width={786}
                           height={1024}
                           className="size-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                         />
-                        {/* Soft studio feathering & fine inner border */}
-                        <div className="absolute inset-0 rounded-lg pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.12)] ring-1 ring-inset ring-black/10" />
-                      </div>
-                      <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-[#C5A880]/20 pointer-events-none" />
-                    </div>
 
-                    {/* Engraved Plaque */}
-                    <div className="mt-4 text-center">
-                      <p className="text-[0.68rem] tracking-[0.25em] uppercase text-[#C5A880] font-semibold">
-                        Sri Surya Granites
-                      </p>
-                      <p className="text-[0.62rem] tracking-widest uppercase text-[#8C847D] mt-0.5">
-                        Mine Ownership Concessionaire • AP
-                      </p>
+                        {/* Discreet floating gold provenance tag */}
+                        <div className="absolute top-2.5 right-2.5 inline-flex items-center gap-1.5 rounded-full bg-[#1C1917]/90 px-2.5 py-0.5 text-[9.5px] font-semibold tracking-widest text-[#E6CA92] uppercase shadow-md backdrop-blur-sm border border-[#E6CA92]/30">
+                          <Gem className="size-2.5 text-primary" />
+                          <span>Chimakurthy AP</span>
+                        </div>
+                      </div>
+
+                      {/* Engraved Executive Nameplate */}
+                      <div className="mt-2 p-3 rounded-xl bg-white/90 border border-[#E8DFC9] text-center shadow-sm">
+                        <p className="font-serif text-base sm:text-lg font-bold tracking-wide text-foreground leading-snug">
+                          {founder.name}
+                        </p>
+                        <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
+                          {founder.role}
+                        </p>
+                        <div className="my-1.5 mx-auto h-px w-12 bg-primary/30" />
+                        <p className="text-[0.68rem] font-medium text-muted-foreground uppercase tracking-widest">
+                          Captive Mine Concessionaire
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Right Column: Editorial Letter, Dignified Name, and Signature */}
+                {/* Right Column: Statement, Executive Charter, and Stylish Signature */}
                 <div className="lg:col-span-7 flex flex-col justify-center">
-                  <div className="flex items-center gap-2">
-                    <span className="h-px w-6 bg-[#C5A880]" />
-                    <span className="text-[0.72rem] uppercase tracking-[0.25em] font-semibold text-[#C5A880]">
-                      Founder &amp; Managing Director
-                    </span>
+                  <div className="inline-flex items-center gap-2 self-start rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+                    <BadgeCheck className="size-3.5 text-primary" />
+                    <span>Executive Directorate</span>
                   </div>
 
-                  <h3 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#FAF7F2]">
-                    {founder.name}
+                  <h3 className="mt-3 font-display text-2xl sm:text-3xl lg:text-[2.2rem] font-bold tracking-tight text-foreground leading-[1.18]">
+                    Direct Quarry Stewardship, Global Sawn Caliber.
                   </h3>
 
-                  <p className="mt-1 text-sm text-[#A3998F] tracking-wide">
-                    Executive Oversight · Mining Operations · Global Trade
-                  </p>
+                  <div className="my-4 h-px w-full bg-gradient-to-r from-primary/40 via-[#EAE3D7] to-transparent" />
 
-                  <div className="my-6 h-px w-full bg-gradient-to-r from-[#C5A880]/30 via-[#C5A880]/15 to-transparent" />
-
-                  {/* Personal Philosophy / Executive Statement */}
-                  <div className="relative">
-                    <Quote className="absolute -top-3 -left-3 size-8 text-[#C5A880]/15 -z-0" />
-                    <blockquote className="relative z-10 text-sm sm:text-base italic leading-relaxed text-[#D6CEBE] font-serif pl-3 border-l-2 border-[#C5A880]/40">
-                      &ldquo;True mastery of natural stone begins at the quarry face. By stewarding our captive Black Galaxy reserves in Chimakurthy, we eliminate middlemen and ensure that every single slab leaving our yard maintains uncompromising gold-fleck brilliance, density, and dimensional accuracy for prestigious projects worldwide.&rdquo;
-                    </blockquote>
+                  {/* Executive Charter / Quote Box */}
+                  <div className="relative rounded-2xl border-l-4 border-primary border border-[#EAE3D7] bg-[#FAF8F5] p-4 sm:p-5 shadow-sm">
+                    <div className="flex gap-3 sm:gap-3.5 items-start">
+                      <Quote className="size-5 shrink-0 text-primary mt-0.5 opacity-80" />
+                      <blockquote className="font-sans text-xs sm:text-sm leading-relaxed text-stone-800 font-normal tracking-wide">
+                        &ldquo;True mastery of natural stone begins at the quarry face. By stewarding our captive Black Galaxy reserves in Chimakurthy, we eliminate middlemen and ensure that every single slab leaving our yard maintains uncompromising gold-fleck brilliance, density, and dimensional accuracy for prestigious architectural projects worldwide.&rdquo;
+                      </blockquote>
+                    </div>
                   </div>
 
-                  {/* Handwritten Signature */}
-                  <div className="mt-6 flex items-center justify-between flex-wrap gap-4 pt-2 border-t border-white/[0.06]">
+                  {/* Operational Caliber Pills */}
+                  <div className="mt-3.5 grid grid-cols-3 gap-2 sm:gap-2.5 text-center">
+                    <div className="rounded-xl border border-[#E8DFC9] bg-white/70 py-2 px-1.5">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-foreground">Captive Mine</p>
+                      <p className="text-[8.5px] sm:text-[9.5px] text-muted-foreground font-medium mt-0.5">Galaxy Reserve Concession</p>
+                    </div>
+                    <div className="rounded-xl border border-[#E8DFC9] bg-white/70 py-2 px-1.5">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-foreground">Italian Polishing</p>
+                      <p className="text-[8.5px] sm:text-[9.5px] text-muted-foreground font-medium mt-0.5">&gt;90 GU Mirror Gloss</p>
+                    </div>
+                    <div className="rounded-xl border border-[#E8DFC9] bg-white/70 py-2 px-1.5">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-foreground">Direct Freight</p>
+                      <p className="text-[8.5px] sm:text-[9.5px] text-muted-foreground font-medium mt-0.5">Port Direct Shipping</p>
+                    </div>
+                  </div>
+
+                  {/* Stylish Signature & Authentication Seal */}
+                  <div className="mt-5 flex items-center justify-between flex-wrap gap-3 pt-3.5 border-t border-[#EAE3D7]">
                     <div>
-                      <p className="font-signature text-3xl sm:text-4xl text-[#E8D4B8] tracking-wider -rotate-2 select-none">
+                      <p className="font-signature text-3xl sm:text-4xl lg:text-[2.65rem] text-primary tracking-wide select-none leading-none">
                         {founder.name}
                       </p>
-                      <p className="text-[0.65rem] uppercase tracking-[0.22em] text-[#8C847D] mt-0.5">
-                        Executive Seal &amp; Authority
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground font-bold mt-1.5">
+                        Founder &amp; Managing Director
+                      </p>
+                      <p className="text-[0.68rem] text-foreground/80 font-medium">
+                        Sri Surya Granites • Chimakurthy, AP
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-6">
-                      <div className="text-right">
-                        <p className="text-lg font-serif font-bold text-[#FAF7F2]">100%</p>
-                        <p className="text-[0.62rem] uppercase tracking-wider text-[#8C847D]">Captive Mine</p>
+                    {/* Official Corporate Verification Seal (SVG) */}
+                    <div className="flex items-center gap-3">
+                      <div className="relative group flex items-center justify-center">
+                        <svg className="size-14 sm:size-16 text-primary/80 shrink-0" viewBox="0 0 100 100" fill="none">
+                          <circle cx="50" cy="50" r="46" stroke="currentColor" strokeWidth="1.2" strokeDasharray="3 2" />
+                          <circle cx="50" cy="50" r="42" stroke="currentColor" strokeWidth="1" />
+                          <circle cx="50" cy="50" r="39" stroke="currentColor" strokeWidth="0.6" />
+                          <path id="seal-top" d="M 20 50 A 30 30 0 0 1 80 50" fill="transparent" />
+                          <path id="seal-bot" d="M 80 50 A 30 30 0 0 1 20 50" fill="transparent" />
+                          <text className="text-[6px] uppercase tracking-[0.25em] font-bold fill-primary">
+                            <textPath href="#seal-top" startOffset="50%" textAnchor="middle">
+                              SRI SURYA GRANITES
+                            </textPath>
+                          </text>
+                          <text className="text-[5.5px] uppercase tracking-[0.22em] font-semibold fill-primary">
+                            <textPath href="#seal-bot" startOffset="50%" textAnchor="middle">
+                              • OFFICIAL SEAL •
+                            </textPath>
+                          </text>
+                          <g transform="translate(38, 38)">
+                            <path d="M12 0 L15 9 L24 12 L15 15 L12 24 L9 15 L0 12 L9 9 Z" fill="currentColor" opacity="0.8" />
+                          </g>
+                        </svg>
                       </div>
-                      <div className="h-7 w-px bg-white/10" />
-                      <div className="text-right">
-                        <p className="text-lg font-serif font-bold text-[#FAF7F2]">Direct</p>
-                        <p className="text-[0.62rem] uppercase tracking-wider text-[#8C847D]">Export Port</p>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Luxury Action Button */}
-                  <div className="mt-8 flex items-center gap-4">
-                    <Link
-                      to="/quote"
-                      className="group inline-flex items-center gap-3 rounded-none border border-[#C5A880] bg-[#C5A880] px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.22em] text-[#1A1816] transition-all hover:bg-transparent hover:text-[#FAF7F2] shadow-lg"
-                    >
-                      <span>Direct Executive Procurement Desk</span>
-                      <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
-                    </Link>
+                      {/* Direct Executive Action */}
+                      <Link
+                        to="/contact"
+                        className="group inline-flex items-center gap-2 rounded-xl border border-primary/60 bg-primary/10 hover:bg-primary hover:text-white px-3.5 py-2 text-xs font-semibold uppercase tracking-wider text-primary transition-all duration-300 shadow-sm"
+                      >
+                        <span>Executive Desk</span>
+                        <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -293,17 +323,71 @@ function Leadership() {
 }
 
 
+const heroSlides = [
+  {
+    src: heroSlabs,
+    alt: "Polished Black Galaxy granite slabs in the SSG Granites warehouse",
+  },
+  {
+    src: heroGallery,
+    alt: "Premium natural granite and marble vertical slab selection at SSG Granites facility",
+  },
+  {
+    src: heroShowroom1,
+    alt: "Architectural luxury natural stone gallery display",
+  },
+  {
+    src: heroShowroom2,
+    alt: "Grand luxury marble and granite exhibition showroom",
+  },
+];
+
 function Hero() {
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 3000); // 3 seconds delay
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section className="relative isolate flex min-h-[88vh] items-center overflow-hidden">
-      <img
-        src={heroSlabs}
-        alt="Polished Black Galaxy granite slabs in the SSG Granites warehouse"
-        width={1920}
-        height={1080}
-        className="absolute inset-0 -z-10 size-full object-cover"
-      />
+      {/* Background Slideshow (4s span) */}
+      {heroSlides.map((slide, index) => (
+        <div
+          key={slide.src}
+          className={`absolute inset-0 -z-10 transition-opacity duration-1000 ease-in-out ${
+            activeSlide === index ? "opacity-100 scale-105" : "opacity-0 scale-100"
+          } transform transition-transform duration-[7000ms]`}
+        >
+          <img
+            src={slide.src}
+            alt={slide.alt}
+            width={1920}
+            height={1080}
+            className="size-full object-cover"
+            loading={index === 0 ? "eager" : "lazy"}
+          />
+        </div>
+      ))}
       <div className="absolute inset-0 -z-10 bg-ink/70" />
+
+      {/* Slide indicator dots */}
+      <div className="absolute bottom-8 right-8 z-20 hidden sm:flex items-center gap-2">
+        {heroSlides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActiveSlide(i)}
+            aria-label={`Slide ${i + 1}`}
+            className={`h-1.5 transition-all duration-500 rounded-full ${
+              activeSlide === i ? "w-8 bg-primary" : "w-2.5 bg-white/40 hover:bg-white/70"
+            }`}
+          />
+        ))}
+      </div>
       <div className="mx-auto w-full max-w-7xl px-5 py-28 lg:px-8">
         <Reveal>
           <p className="eyebrow text-primary">Quarry Owners · Processors · Exporters</p>
@@ -400,7 +484,7 @@ function About() {
 
 function Process() {
   return (
-    <section className="bg-secondary py-24 lg:py-32">
+    <section className="bg-secondary pt-12 pb-24 sm:pt-14 sm:pb-28 lg:pt-16 lg:pb-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal className="max-w-2xl">
           <p className="eyebrow">From Mine to Market</p>

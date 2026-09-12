@@ -18,8 +18,8 @@ export function Footer() {
             />
           </div>
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-background/60">
-            Integrated granite mining, processing &amp; export — Black Galaxy, Steel Grey and Black
-            Pearl, straight from our own quarry.
+            Integrated granite mining, processing &amp; export specializing in Black Galaxy, Steel Grey,
+            Black Pearl, Tan Brown, Absolute Black, and a wide collection of premium Indian granites.
           </p>
         </div>
 

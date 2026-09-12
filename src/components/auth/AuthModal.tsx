@@ -61,7 +61,7 @@ export function AuthModal({ open, onOpenChange, defaultTab = "signin" }: AuthMod
       if (isAdmin) {
         toast.success("Welcome back, Administrator");
       } else {
-        toast.success(`Welcome back, ${data.user.user_metadata?.full_name || data.user.email}`);
+        toast.success(`Welcome back, ${data.user.user_metadata?.["full_name"] || data.user.email}`);
       }
 
       resetForm();

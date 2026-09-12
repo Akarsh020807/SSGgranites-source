@@ -56,6 +56,10 @@ function AdminLogin() {
       });
 
       if (signInError || !data.user) {
+        if (signInError?.message?.toLowerCase().includes("email not confirmed")) {
+          setError("Email not yet confirmed. Please verify your email inbox or execute the SQL confirmation in your Supabase editor.");
+          return;
+        }
         setError("Invalid email or password.");
         return;
       }

@@ -161,7 +161,7 @@ export function Header() {
                   >
                     <UserIcon className="size-3.5 text-primary" />
                     <span className="max-w-[130px] truncate">
-                      {user.user_metadata?.full_name || user.email}
+                      {user.user_metadata?.["full_name"] || user.email}
                     </span>
                     <ChevronDown className="size-3 opacity-60" />
                   </button>
@@ -284,7 +284,7 @@ export function Header() {
                   <p className="text-xs text-muted-foreground px-1 truncate">
                     Logged in as{" "}
                     <span className="font-medium text-foreground">
-                      {user.user_metadata?.full_name || user.email}
+                      {user.user_metadata?.["full_name"] || user.email}
                     </span>
                     {isAdmin && (
                       <span className="ml-2 rounded bg-primary/10 px-1.5 py-0.2 text-[10px] font-semibold uppercase text-primary">

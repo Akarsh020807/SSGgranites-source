@@ -47,8 +47,8 @@ import { products, type Product } from "@/lib/products";
 import { createLead } from "@/services/leadService";
 
 export const Route = createFileRoute("/quote")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    product: typeof search.product === "string" ? search.product : undefined,
+  validateSearch: (search: Record<string, unknown>): { product?: string | undefined } => ({
+    product: typeof search["product"] === "string" ? (search["product"] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -148,60 +148,6 @@ const finishes = [
   },
 ];
 
-const volumes = [
-  {
-    id: "1-container",
-    label: "1 Full 20ft Container (~4,500 sq.ft / ~27 Metric Tons)",
-    desc: "Standard trial and recurring export batch. Maximum shipping cost efficiency.",
-    containers: 1,
-  },
-  {
-    id: "2-containers",
-    label: "2 Full Containers (~9,000 sq.ft)",
-    desc: "Multi-variety container batch or single large commercial installation.",
-    containers: 2,
-  },
-  {
-    id: "3-5-containers",
-    label: "3 to 5 Containers (Commercial Project Lot: ~15,000 – 22,500 sq.ft)",
-    desc: "High-volume staged container dispatch for hospital, hotel, or residential complexes.",
-    containers: 4,
-  },
-  {
-    id: "partial-lcl",
-    label: "Regional / Domestic Consignment (500 – 2,500 sq.ft)",
-    desc: "Direct truckload delivery across India from Chimakurthy processing yard.",
-    containers: 0.5,
-  },
-  {
-    id: "rough-blocks-lot",
-    label: "Rough Quarry Blocks (2 to 6 Untrimmed Blocks)",
-    desc: "Direct captive mine block supply with dressing records and gang-saw block test cuts.",
-    containers: 2,
-  },
-];
-
-const shippingIncoterms = [
-  {
-    code: "FOB",
-    name: "FOB Chennai / Krishnapatnam",
-    tagline: "Free on Board (Ocean Port)",
-    desc: "SSG Granites manages factory crating, transit, and vessel loading. Buyer arranges ocean freight.",
-  },
-  {
-    code: "CIF",
-    name: "CIF Destination Port",
-    tagline: "Cost, Insurance & Freight",
-    desc: "Complete turnkey ocean transit. We cover sea freight and marine insurance to your local seaport.",
-  },
-  {
-    code: "EXW",
-    name: "EXW Chimakurthy Factory Yard",
-    tagline: "Ex-Works / Mill Gate",
-    desc: "Buyer inspects and takes handover directly at our Chimakurthy factory weighbridge.",
-  },
-];
-
 function generateRfqId(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
@@ -225,8 +171,8 @@ function QuotePage() {
     return found ? found.slug : "black-galaxy";
   }, [searchParams.product]);
 
-  // Stepper state (1 to 4)
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+  // Stepper state (1 to 3)
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
 
   // Filter for Step 1
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
@@ -235,11 +181,6 @@ function QuotePage() {
   const [selectedProductSlug, setSelectedProductSlug] = useState(initialProductSlug);
   const [selectedThicknessId, setSelectedThicknessId] = useState("20mm-gangsaw");
   const [selectedFinish, setSelectedFinish] = useState("Polished");
-  const [selectedVolumeId, setSelectedVolumeId] = useState("1-container");
-  const [selectedIncoterm, setSelectedIncoterm] = useState("FOB");
-  const [destinationPort, setDestinationPort] = useState("");
-  const [timeline, setTimeline] = useState("Ready for dispatch in 21–30 days");
-  const [packagingType, setPackagingType] = useState("Seaworthy Fumigated Wooden A-Frames");
 
   // Buyer Info
   const [buyerName, setBuyerName] = useState("");
@@ -256,11 +197,6 @@ function QuotePage() {
     product: Product;
     thickness: (typeof thicknesses)[0];
     finish: string;
-    volume: (typeof volumes)[0];
-    incoterm: (typeof shippingIncoterms)[0];
-    destination: string;
-    timeline: string;
-    packaging: string;
     buyerName: string;
     companyName: string;
     email: string;
@@ -270,24 +206,14 @@ function QuotePage() {
   } | null>(null);
 
   // Derived objects
-  const selectedProduct = useMemo(
-    () => products.find((p) => p.slug === selectedProductSlug) || products[0],
+  const selectedProduct: Product = useMemo(
+    () => products.find((p) => p.slug === selectedProductSlug) || products[0]!,
     [selectedProductSlug],
   );
 
   const selectedThickness = useMemo(
-    () => thicknesses.find((t) => t.id === selectedThicknessId) || thicknesses[0],
+    () => thicknesses.find((t) => t.id === selectedThicknessId) || thicknesses[0]!,
     [selectedThicknessId],
-  );
-
-  const selectedVolume = useMemo(
-    () => volumes.find((v) => v.id === selectedVolumeId) || volumes[0],
-    [selectedVolumeId],
-  );
-
-  const selectedIncotermObj = useMemo(
-    () => shippingIncoterms.find((i) => i.code === selectedIncoterm) || shippingIncoterms[0],
-    [selectedIncoterm],
   );
 
   // Filtered products
@@ -324,11 +250,6 @@ function QuotePage() {
         product: selectedProduct,
         thickness: selectedThickness,
         finish: selectedFinish,
-        volume: selectedVolume,
-        incoterm: selectedIncotermObj,
-        destination: destinationPort || "Global Port",
-        timeline,
-        packaging: packagingType,
         buyerName,
         companyName,
         email,
@@ -357,11 +278,6 @@ function QuotePage() {
       `Stone: ${selectedProduct.name} ${selectedProduct.flagship ? "[Captive Quarry Mine]" : ""}`,
       `Cut / Thickness: ${selectedThickness.label} (${selectedThickness.badge})`,
       `Surface Finish: ${selectedFinish}`,
-      `Volume Specification: ${selectedVolume.label}`,
-      `Shipping Incoterm: ${selectedIncotermObj.code} (${selectedIncotermObj.name})`,
-      `Destination Port / City: ${destinationPort.trim() || "Port TBA"}`,
-      `Packaging: ${packagingType}`,
-      `Target Dispatch Schedule: ${timeline}`,
       `Buyer: ${buyerName.trim()} | Company: ${companyName.trim() || "Not specified"}`,
       notes.trim() ? `Custom Requirements:\n${notes.trim()}` : "",
     ]
@@ -376,7 +292,7 @@ function QuotePage() {
         subject: `[${rfqId}] RFQ for ${selectedProduct.name} (${selectedThickness.label})`,
         message: specSummary,
         source: "Enterprise RFQ Portal",
-        priority: selectedVolume.containers >= 1 ? "Urgent" : "High",
+        priority: "High",
       });
 
       setSubmittedRfq({
@@ -384,11 +300,6 @@ function QuotePage() {
         product: selectedProduct,
         thickness: selectedThickness,
         finish: selectedFinish,
-        volume: selectedVolume,
-        incoterm: selectedIncotermObj,
-        destination: destinationPort.trim() || "Destination Port TBA",
-        timeline,
-        packaging: packagingType,
         buyerName: buyerName.trim(),
         companyName: companyName.trim() || "Private Procurement",
         email: email.trim(),
@@ -476,12 +387,11 @@ function QuotePage() {
         {!submittedRfq && (
           <div className="sticky top-24 z-40 border-b border-border bg-background/95 backdrop-blur shadow-sm">
             <div className="mx-auto max-w-7xl px-5 lg:px-8">
-              <div className="grid grid-cols-4 py-3 text-center sm:text-left">
+              <div className="grid grid-cols-3 py-3 text-center sm:text-left">
                 {[
                   { step: 1, label: "Stone Variety", icon: Mountain },
                   { step: 2, label: "Sizing & Finish", icon: Layers },
-                  { step: 3, label: "Volume & Port", icon: Ship },
-                  { step: 4, label: "Review & Proforma", icon: FileCheck2 },
+                  { step: 3, label: "Review & Proforma", icon: FileCheck2 },
                 ].map((s) => {
                   const isActive = currentStep === s.step;
                   const isDone = currentStep > s.step;
@@ -489,7 +399,7 @@ function QuotePage() {
                     <button
                       key={s.step}
                       type="button"
-                      onClick={() => setCurrentStep(s.step as 1 | 2 | 3 | 4)}
+                      onClick={() => setCurrentStep(s.step as 1 | 2 | 3)}
                       className={`group flex items-center justify-center sm:justify-start gap-2.5 py-1.5 px-2 transition-all cursor-pointer ${
                         isActive
                           ? "text-primary font-bold border-b-2 border-primary"
@@ -598,42 +508,6 @@ function QuotePage() {
                               {submittedRfq.finish}
                             </p>
                           </div>
-
-                          <div>
-                            <p className="text-[0.7rem] uppercase tracking-wider text-muted-foreground">
-                              Order Volume
-                            </p>
-                            <p className="mt-1 font-semibold text-primary">
-                              {submittedRfq.volume.label}
-                            </p>
-                          </div>
-
-                          <div>
-                            <p className="text-[0.7rem] uppercase tracking-wider text-muted-foreground">
-                              Shipping Terms (Incoterms)
-                            </p>
-                            <p className="mt-1 font-semibold text-foreground">
-                              {submittedRfq.incoterm.code} — {submittedRfq.incoterm.name}
-                            </p>
-                          </div>
-
-                          <div>
-                            <p className="text-[0.7rem] uppercase tracking-wider text-muted-foreground">
-                              Destination Port / City
-                            </p>
-                            <p className="mt-1 font-semibold text-foreground">
-                              {submittedRfq.destination}
-                            </p>
-                          </div>
-
-                          <div className="sm:col-span-2 lg:col-span-3 border-t border-border/60 pt-3">
-                            <p className="text-[0.7rem] uppercase tracking-wider text-muted-foreground">
-                              Packaging Protocol
-                            </p>
-                            <p className="mt-0.5 font-medium text-foreground text-xs">
-                              {submittedRfq.packaging} • ISPM-15 Fumigation Certified
-                            </p>
-                          </div>
                         </div>
                       </div>
 
@@ -688,7 +562,7 @@ function QuotePage() {
                                 href={`https://wa.me/917799999555?text=Hello%20SSG%20Granites%2C%20I%20have%20submitted%20Quotation%20%23${submittedRfq.id}%20for%20${encodeURIComponent(
                                   submittedRfq.product.name,
                                 )}%20(${encodeURIComponent(
-                                  submittedRfq.volume.label,
+                                  submittedRfq.thickness.label,
                                 )}).%20Please%20provide%20the%20proforma%20rates.`}
                                 target="_blank"
                                 rel="noreferrer"
@@ -937,199 +811,24 @@ function QuotePage() {
                           >
                             <ArrowLeft className="size-4" />
                             <span>Back to Stone Selection</span>
-                          </button>
-                          <button
+                          </button>                          <button
                             type="button"
                             onClick={() => setCurrentStep(3)}
                             className="inline-flex items-center gap-2 bg-primary px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground hover:bg-primary/90 transition-all shadow-md cursor-pointer"
                           >
-                            <span>Next: Volume &amp; Shipping</span>
+                            <span>Next: Review &amp; Proforma</span>
                             <ArrowRight className="size-4" />
                           </button>
                         </div>
                       </div>
                     )}
 
-                    {/* STEP 3: VOLUME & LOGISTICS */}
+                    {/* STEP 3: BUYER DETAILS & FINAL SUBMIT */}
                     {currentStep === 3 && (
                       <div className="space-y-8">
                         <div className="border-b border-border pb-5">
                           <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                            Step 3 of 4
-                          </span>
-                          <h2 className="mt-1 text-2xl sm:text-3xl font-light text-foreground">
-                            Volume, Port &amp; Shipping Terms
-                          </h2>
-                        </div>
-
-                        {/* Order Volume */}
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-foreground mb-3">
-                            Required Order Quantity *
-                          </label>
-                          <div className="space-y-2.5">
-                            {volumes.map((v) => {
-                              const isSelected = selectedVolumeId === v.id;
-                              return (
-                                <button
-                                  key={v.id}
-                                  type="button"
-                                  onClick={() => setSelectedVolumeId(v.id)}
-                                  className={`w-full text-left border p-4 transition-all cursor-pointer ${
-                                    isSelected
-                                      ? "border-primary bg-primary/5 ring-1 ring-primary shadow-sm"
-                                      : "border-border bg-background hover:bg-secondary/30"
-                                  }`}
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-sm font-semibold text-foreground">
-                                      {v.label}
-                                    </span>
-                                    {isSelected && <Check className="size-4 text-primary" />}
-                                  </div>
-                                  <p className="mt-1 text-xs text-muted-foreground">{v.desc}</p>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Shipping Terms */}
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-foreground mb-3">
-                            Incoterms (Delivery Term) *
-                          </label>
-                          <div className="grid gap-3 sm:grid-cols-3">
-                            {shippingIncoterms.map((inc) => {
-                              const isSelected = selectedIncoterm === inc.code;
-                              return (
-                                <button
-                                  key={inc.code}
-                                  type="button"
-                                  onClick={() => setSelectedIncoterm(inc.code)}
-                                  className={`text-left border p-4 transition-all cursor-pointer ${
-                                    isSelected
-                                      ? "border-primary bg-primary text-primary-foreground font-bold shadow-md"
-                                      : "border-border bg-background text-foreground hover:bg-secondary/40"
-                                  }`}
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-base font-bold">{inc.code}</span>
-                                    {isSelected && <Check className="size-4" />}
-                                  </div>
-                                  <p
-                                    className={`mt-1 text-xs font-semibold ${
-                                      isSelected ? "opacity-95" : "text-primary"
-                                    }`}
-                                  >
-                                    {inc.tagline}
-                                  </p>
-                                  <p
-                                    className={`mt-2 text-[0.7rem] leading-relaxed ${
-                                      isSelected ? "opacity-90" : "text-muted-foreground"
-                                    }`}
-                                  >
-                                    {inc.desc}
-                                  </p>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Port & Timeline */}
-                        <div className="grid gap-6 sm:grid-cols-2">
-                          <div>
-                            <label className="block text-xs font-bold uppercase tracking-wider text-foreground mb-2">
-                              Destination Seaport / Delivery City
-                            </label>
-                            <input
-                              type="text"
-                              value={destinationPort}
-                              onChange={(e) => setDestinationPort(e.target.value)}
-                              placeholder="e.g. Houston (USA), Antwerp (Europe), Dubai (UAE)"
-                              className={inputClass}
-                            />
-                            <p className="mt-1 text-[0.7rem] text-muted-foreground">
-                              Quick suggestions: Houston Port • Rotterdam • Jebel Ali • Chennai Port
-                            </p>
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-bold uppercase tracking-wider text-foreground mb-2">
-                              Target Shipment Timeline
-                            </label>
-                            <select
-                              value={timeline}
-                              onChange={(e) => setTimeline(e.target.value)}
-                              className={inputClass}
-                            >
-                              <option value="Ready for dispatch in 21–30 days">
-                                Ready for dispatch in 21–30 days (Standard)
-                              </option>
-                              <option value="Urgent dispatch (< 15 days)">
-                                Urgent Dispatch (&lt; 15 days — from current yard stock)
-                              </option>
-                              <option value="Staged schedule (45–60 days)">
-                                Staged Project Delivery (45–60 days)
-                              </option>
-                              <option value="Budgeting & Planning stage">
-                                Future Project Budgeting &amp; Planning
-                              </option>
-                            </select>
-                          </div>
-                        </div>
-
-                        {/* Packaging Protocol */}
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-foreground mb-2">
-                            Export Packaging Specification
-                          </label>
-                          <select
-                            value={packagingType}
-                            onChange={(e) => setPackagingType(e.target.value)}
-                            className={inputClass}
-                          >
-                            <option value="Seaworthy Fumigated Wooden A-Frames">
-                              Heavy-Duty Fumigated Wooden A-Frames (ISPM-15 Certified)
-                            </option>
-                            <option value="Steel-Reinforced Closed Wooden Crates">
-                              Steel-Reinforced Wooden Crates (Cut-to-size Tiles)
-                            </option>
-                            <option value="Block Direct Stuffing with Timber Wedging">
-                              Rough Blocks Direct Container Wedging
-                            </option>
-                          </select>
-                        </div>
-
-                        {/* Step Navigation */}
-                        <div className="flex items-center justify-between pt-6 border-t border-border">
-                          <button
-                            type="button"
-                            onClick={() => setCurrentStep(2)}
-                            className="inline-flex items-center gap-2 border border-border px-6 py-3 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-secondary transition-colors"
-                          >
-                            <ArrowLeft className="size-4" />
-                            <span>Back to Specs</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setCurrentStep(4)}
-                            className="inline-flex items-center gap-2 bg-primary px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground hover:bg-primary/90 transition-all shadow-md cursor-pointer"
-                          >
-                            <span>Final Step: Buyer Review</span>
-                            <ArrowRight className="size-4" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* STEP 4: BUYER DETAILS & FINAL SUBMIT */}
-                    {currentStep === 4 && (
-                      <div className="space-y-8">
-                        <div className="border-b border-border pb-5">
-                          <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                            Step 4 of 4
+                            Step 3 of 3
                           </span>
                           <h2 className="mt-1 text-2xl sm:text-3xl font-light text-foreground">
                             Buyer Information &amp; Submit
@@ -1164,7 +863,7 @@ function QuotePage() {
                                 type="text"
                                 value={companyName}
                                 onChange={(e) => setCompanyName(e.target.value)}
-                                placeholder="e.g. Global Stone Importers LLC"
+                                placeholder="e.g. Miller Stone Importers Inc"
                                 className={inputClass}
                               />
                             </div>
@@ -1216,7 +915,7 @@ function QuotePage() {
 
                           <div>
                             <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-foreground/80">
-                              Specific Sizing / Notes / Port Instructions
+                              Specific Sizing / Notes / Requirements
                             </label>
                             <textarea
                               rows={3}
@@ -1260,11 +959,11 @@ function QuotePage() {
                           <div className="pt-2">
                             <button
                               type="button"
-                              onClick={() => setCurrentStep(3)}
-                              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                              onClick={() => setCurrentStep(2)}
+                              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground cursor-pointer"
                             >
                               <ArrowLeft className="size-3.5" />
-                              <span>Back to Volume &amp; Port</span>
+                              <span>Back to Sizing &amp; Finish</span>
                             </button>
                           </div>
                         </div>
@@ -1281,7 +980,7 @@ function QuotePage() {
                             Live RFQ Summary
                           </span>
                           <span className="text-[0.65rem] font-semibold text-muted-foreground uppercase">
-                            Step {currentStep} of 4
+                            Step {currentStep} of 3
                           </span>
                         </div>
 
@@ -1319,26 +1018,6 @@ function QuotePage() {
                             <span className="text-muted-foreground">Finish:</span>
                             <span className="font-semibold text-foreground">{selectedFinish}</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Volume:</span>
-                            <span className="font-semibold text-primary truncate max-w-[170px]">
-                              {selectedVolume.label}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Shipping:</span>
-                            <span className="font-semibold text-foreground">
-                              {selectedIncotermObj.code}
-                            </span>
-                          </div>
-                          {destinationPort && (
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Port:</span>
-                              <span className="font-semibold text-foreground truncate max-w-[170px]">
-                                {destinationPort}
-                              </span>
-                            </div>
-                          )}
                         </div>
 
                         {/* Live Container Metric Box */}
