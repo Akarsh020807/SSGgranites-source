@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
+  Archive,
   ArrowLeft,
   ArrowUpDown,
   Calendar,
@@ -27,6 +28,7 @@ import {
   Phone,
   PhoneCall,
   RefreshCw,
+  RotateCcw,
   Search,
   Send,
   ShieldAlert,
@@ -271,9 +273,10 @@ function LeadsPage() {
   const [leadNotes, setLeadNotes] = useState<Record<string, string>>({});
   const [expandedNoteId, setExpandedNoteId] = useState<string | null>(null);
 
-  // Delete modal controls
+  // Delete & Archive modal controls
   const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
+  const [viewArchived, setViewArchived] = useState(false);
 
   // Load saved notes from localStorage
   useEffect(() => {
@@ -305,23 +308,26 @@ function LeadsPage() {
   const [loginBusy, setLoginBusy] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  // Fetch leads whenever verified admin status is active
+  // Fetch leads whenever verified admin status is active or viewArchived changes
   useEffect(() => {
     if (isAdmin) {
-      fetchLeads(false);
+      fetchLeads(false, viewArchived);
     }
-  }, [isAdmin]);
+  }, [isAdmin, viewArchived]);
 
-  async function fetchLeads(showToast = false) {
+  async function fetchLeads(showToast = false, archived = viewArchived) {
     try {
       if (showToast) setRefreshing(true);
       else setLoadingLeads(true);
 
-      const { data, error } = await supabase
-        .from("leads")
-        .select("*")
-        .is("deleted_at", null)
-        .order("created_at", { ascending: false });
+      let query = supabase.from("leads").select("*");
+      if (archived) {
+        query = query.not("deleted_at", "is", null);
+      } else {
+        query = query.is("deleted_at", null);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
 
       if (error) {
         throw error;
@@ -362,6 +368,47 @@ function LeadsPage() {
     } catch (err: any) {
       console.error("Status update error:", err);
       toast.error("Failed to update status: " + err.message);
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function handleArchive(leadId: string, name: string) {
+    try {
+      setDeleteBusy(true);
+      const { error } = await supabase
+        .from("leads")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", leadId);
+
+      if (error) throw error;
+
+      setLeads((prev) => prev.filter((l) => l.id !== leadId));
+      setLeadToDelete(null);
+      toast.success(`Enquiry from ${name} moved to archive`);
+    } catch (err: any) {
+      console.error("Archive error:", err);
+      toast.error("Failed to archive: " + err.message);
+    } finally {
+      setDeleteBusy(false);
+    }
+  }
+
+  async function handleRestore(leadId: string, name: string) {
+    try {
+      setUpdatingId(leadId);
+      const { error } = await supabase
+        .from("leads")
+        .update({ deleted_at: null })
+        .eq("id", leadId);
+
+      if (error) throw error;
+
+      setLeads((prev) => prev.filter((l) => l.id !== leadId));
+      toast.success(`Enquiry from ${name} restored to active pipeline`);
+    } catch (err: any) {
+      console.error("Restore error:", err);
+      toast.error("Failed to restore: " + err.message);
     } finally {
       setUpdatingId(null);
     }
@@ -854,26 +901,65 @@ function LeadsPage() {
             </div>
 
             {/* Results Count Summary */}
-            <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground px-1">
-              <span>
-                Showing <strong className="text-foreground">{filteredLeads.length}</strong> of {leads.length} total enquiries
-              </span>
-              {(searchQuery || statusFilter !== "all" || varietyFilter !== "All Varieties") && (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground px-1">
+              <div>
+                {viewArchived ? (
+                  <span className="font-semibold text-amber-900">
+                    Showing <strong className="text-foreground">{filteredLeads.length}</strong> archived records
+                  </span>
+                ) : (
+                  <span>
+                    Showing <strong className="text-foreground">{filteredLeads.length}</strong> of {leads.length} total enquiries
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3">
+                {(searchQuery || statusFilter !== "all" || varietyFilter !== "All Varieties") && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setStatusFilter("all");
+                      setVarietyFilter("All Varieties");
+                    }}
+                    className="text-primary hover:underline font-medium cursor-pointer"
+                  >
+                    Reset all filters
+                  </button>
+                )}
+
+                {/* Small subtle option to toggle view archived without affecting existing UI */}
                 <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setStatusFilter("all");
-                    setVarietyFilter("All Varieties");
-                  }}
-                  className="text-primary hover:underline font-medium cursor-pointer"
+                  type="button"
+                  onClick={() => setViewArchived(!viewArchived)}
+                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  title={viewArchived ? "Switch back to active enquiries" : "View archived records"}
                 >
-                  Reset all filters
+                  <Archive className="size-3.5" />
+                  <span>{viewArchived ? "Back to Active Enquiries" : "View Archived"}</span>
                 </button>
-              )}
+              </div>
             </div>
 
             {/* Leads View Container: Dossier View vs Data Table View */}
             <div className="mt-3">
+              {viewArchived && (
+                <div className="mb-4 flex items-center justify-between rounded-xl border border-amber-300/80 bg-amber-50/80 px-4 py-2.5 text-xs text-amber-900 shadow-2xs">
+                  <div className="flex items-center gap-2">
+                    <Archive className="size-4 text-amber-700 shrink-0" />
+                    <span>
+                      <strong>Archived Pipeline Mode</strong> — Showing previously archived enquiries.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setViewArchived(false)}
+                    className="font-semibold text-primary hover:underline cursor-pointer shrink-0"
+                  >
+                    ← Back to Active Enquiries
+                  </button>
+                </div>
+              )}
               {loadingLeads ? (
                 <div className="flex min-h-[300px] flex-col items-center justify-center rounded-2xl border border-border bg-white py-16 gap-3 shadow-sm">
                   <Loader2 className="size-8 animate-spin text-primary" />
@@ -1004,14 +1090,35 @@ function LeadsPage() {
                                 >
                                   <Mail className="size-4" />
                                 </a>
-                                <button
-                                  type="button"
-                                  onClick={() => setLeadToDelete(lead)}
-                                  className="rounded-lg p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-                                  title="Delete Enquiry"
-                                >
-                                  <Trash2 className="size-4" />
-                                </button>
+                                {viewArchived ? (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRestore(lead.id, lead.name)}
+                                      className="rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
+                                      title="Restore to Active Pipeline"
+                                    >
+                                      <RotateCcw className="size-4" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setLeadToDelete(lead)}
+                                      className="rounded-lg p-1.5 text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                                      title="Permanently Delete Record"
+                                    >
+                                      <Trash2 className="size-4" />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => setLeadToDelete(lead)}
+                                    className="rounded-lg p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                                    title="Delete Enquiry"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </button>
+                                )}
                               </div>
                             </td>
                           </tr>
@@ -1308,17 +1415,38 @@ function LeadsPage() {
                               </a>
                             </div>
 
-                            {/* Delete Action */}
+                            {/* Delete / Restore Action */}
                             <div className="pt-2 border-t border-border/60 flex items-center justify-end text-xs">
-                              <button
-                                type="button"
-                                onClick={() => setLeadToDelete(lead)}
-                                title="Delete enquiry"
-                                className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer"
-                              >
-                                <Trash2 className="size-3.5" />
-                                <span>Delete</span>
-                              </button>
+                              {viewArchived ? (
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRestore(lead.id, lead.name)}
+                                    className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-emerald-700 transition-colors cursor-pointer"
+                                  >
+                                    <RotateCcw className="size-3" />
+                                    <span>Restore to Active</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setLeadToDelete(lead)}
+                                    className="inline-flex items-center gap-1 rounded-lg bg-destructive/10 px-2.5 py-1 text-[11px] font-semibold text-destructive hover:bg-destructive hover:text-white transition-colors cursor-pointer"
+                                  >
+                                    <Trash2 className="size-3" />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setLeadToDelete(lead)}
+                                  title="Delete enquiry"
+                                  className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                  <span>Delete</span>
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1331,7 +1459,7 @@ function LeadsPage() {
           </>
         )}
 
-        {/* ======================== CONFIRM PERMANENT DELETE MODAL ======================== */}
+        {/* ======================== CONFIRM DELETE / ARCHIVE MODAL ======================== */}
         {leadToDelete && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-100">
             <div className="relative w-full max-w-md rounded-2xl border border-border bg-white p-6 shadow-2xl space-y-4">
@@ -1342,7 +1470,7 @@ function LeadsPage() {
                   </div>
                   <div>
                     <h3 className="font-display text-base font-bold text-foreground">
-                      Delete Commercial Enquiry?
+                      Delete or Archive Enquiry?
                     </h3>
                     <p className="text-xs text-muted-foreground">
                       {getLeadRefCode(leadToDelete.id)} • {leadToDelete.name}
@@ -1368,18 +1496,30 @@ function LeadsPage() {
               </div>
 
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Are you sure you want to permanently delete this enquiry? This action cannot be undone.
+                Choose to move this enquiry to archive to preserve the record, or delete it permanently from the database.
               </p>
 
-              <div className="pt-3 border-t border-border/80 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-border/80 flex flex-wrap items-center justify-end gap-2">
                 <button
                   type="button"
                   disabled={deleteBusy}
                   onClick={() => setLeadToDelete(null)}
-                  className="rounded-xl border border-border px-4 py-2 text-xs font-semibold text-foreground hover:bg-secondary cursor-pointer transition-colors"
+                  className="rounded-xl border border-border px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-secondary cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
+
+                {!viewArchived && (
+                  <button
+                    type="button"
+                    disabled={deleteBusy}
+                    onClick={() => handleArchive(leadToDelete.id, leadToDelete.name)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-white px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-secondary cursor-pointer transition-colors"
+                  >
+                    <Archive className="size-3.5 text-muted-foreground" />
+                    <span>Archive Enquiry</span>
+                  </button>
+                )}
 
                 <button
                   type="button"
@@ -1392,7 +1532,23 @@ function LeadsPage() {
                   ) : (
                     <Trash2 className="size-3.5" />
                   )}
-                  <span>Delete</span>
+                  <span>Permanently Delete</span>
+                </button>
+              </div>
+
+              {/* Small subtle option to see archived without affecting existing UI */}
+              <div className="pt-2 border-t border-dashed border-border/60 flex items-center justify-between text-[11px] text-muted-foreground">
+                <span>Looking for past archived records?</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLeadToDelete(null);
+                    setViewArchived(true);
+                  }}
+                  className="font-medium text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>View Archived</span>
+                  <span>→</span>
                 </button>
               </div>
             </div>
