@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
-  AlertTriangle,
   Archive,
   ArrowLeft,
   ArrowUpDown,
@@ -274,8 +273,8 @@ function LeadsPage() {
   const [leadNotes, setLeadNotes] = useState<Record<string, string>>({});
   const [expandedNoteId, setExpandedNoteId] = useState<string | null>(null);
 
-  // Archive & Delete modal controls
-  const [leadToManage, setLeadToManage] = useState<Lead | null>(null);
+  // Archive & Delete controls
+  const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [viewArchived, setViewArchived] = useState(false);
 
@@ -385,7 +384,7 @@ function LeadsPage() {
       if (error) throw error;
 
       setLeads((prev) => prev.filter((l) => l.id !== leadId));
-      setLeadToManage(null);
+      setLeadToDelete(null);
       toast.success(`Enquiry from ${name} moved to archive`);
     } catch (err: any) {
       console.error("Archive error:", err);
@@ -406,7 +405,7 @@ function LeadsPage() {
       if (error) throw error;
 
       setLeads((prev) => prev.filter((l) => l.id !== leadId));
-      setLeadToManage(null);
+      setLeadToDelete(null);
       toast.success(`Enquiry from ${name} permanently deleted`);
     } catch (err: any) {
       console.error("Permanent delete error:", err);
@@ -1095,7 +1094,7 @@ function LeadsPage() {
                                     </button>
                                     <button
                                       type="button"
-                                      onClick={() => handlePermanentDelete(lead.id, lead.name)}
+                                      onClick={() => setLeadToDelete(lead)}
                                       className="rounded-lg p-1.5 text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                                       title="Permanently Delete Record"
                                     >
@@ -1103,14 +1102,24 @@ function LeadsPage() {
                                     </button>
                                   </>
                                 ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => setLeadToManage(lead)}
-                                    className="rounded-lg p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-                                    title="Archive or Delete Lead"
-                                  >
-                                    <Trash2 className="size-4" />
-                                  </button>
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleArchive(lead.id, lead.name)}
+                                      className="rounded-lg p-1.5 text-muted-foreground hover:text-amber-800 hover:bg-amber-500/10 transition-colors cursor-pointer"
+                                      title="Archive Enquiry"
+                                    >
+                                      <Archive className="size-4" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setLeadToDelete(lead)}
+                                      className="rounded-lg p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                                      title="Delete Enquiry Permanently"
+                                    >
+                                      <Trash2 className="size-4" />
+                                    </button>
+                                  </>
                                 )}
                               </div>
                             </td>
@@ -1412,7 +1421,7 @@ function LeadsPage() {
                             <div className="pt-2 border-t border-border/60 flex items-center justify-between text-xs">
                               <span className="text-[11px] text-muted-foreground font-medium">Record Control</span>
                               {viewArchived ? (
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5">
                                   <button
                                     type="button"
                                     onClick={() => handleRestore(lead.id, lead.name)}
@@ -1423,7 +1432,7 @@ function LeadsPage() {
                                   </button>
                                   <button
                                     type="button"
-                                    onClick={() => handlePermanentDelete(lead.id, lead.name)}
+                                    onClick={() => setLeadToDelete(lead)}
                                     className="inline-flex items-center gap-1 rounded-lg bg-destructive/10 px-2.5 py-1 text-[11px] font-semibold text-destructive hover:bg-destructive hover:text-white transition-colors cursor-pointer"
                                   >
                                     <Trash2 className="size-3" />
@@ -1431,15 +1440,26 @@ function LeadsPage() {
                                   </button>
                                 </div>
                               ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => setLeadToManage(lead)}
-                                  title="Archive or delete this enquiry"
-                                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                                >
-                                  <Trash2 className="size-3" />
-                                  <span>Archive / Delete</span>
-                                </button>
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleArchive(lead.id, lead.name)}
+                                    title="Move enquiry to archive"
+                                    className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-2.5 py-1 text-[11px] font-medium text-muted-foreground hover:border-[#DECDB3] hover:text-foreground transition-colors cursor-pointer"
+                                  >
+                                    <Archive className="size-3 text-muted-foreground" />
+                                    <span>Archive</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setLeadToDelete(lead)}
+                                    title="Delete enquiry permanently"
+                                    className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer"
+                                  >
+                                    <Trash2 className="size-3" />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
                               )}
                             </div>
                           </div>
@@ -1453,94 +1473,80 @@ function LeadsPage() {
           </>
         )}
 
-        {/* ======================== ARCHIVE / PERMANENT DELETE MODAL ======================== */}
-        {leadToManage && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+        {/* ======================== CONFIRM PERMANENT DELETE MODAL ======================== */}
+        {leadToDelete && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-100">
             <div className="relative w-full max-w-md rounded-2xl border border-border bg-white p-6 shadow-2xl space-y-4">
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
-                    <AlertTriangle className="size-5" />
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                    <Trash2 className="size-5" />
                   </div>
                   <div>
-                    <h3 className="font-display text-lg font-bold text-foreground">
-                      Manage Enquiry Record
+                    <h3 className="font-display text-base font-bold text-foreground">
+                      Delete Commercial Enquiry?
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      {getLeadRefCode(leadToManage.id)} • {leadToManage.name}
+                      {getLeadRefCode(leadToDelete.id)} • {leadToDelete.name}
                     </p>
                   </div>
                 </div>
                 <button
                   type="button"
                   disabled={deleteBusy}
-                  onClick={() => setLeadToManage(null)}
-                  className="rounded-lg p-1 text-muted-foreground hover:text-foreground cursor-pointer"
+                  onClick={() => setLeadToDelete(null)}
+                  className="rounded-lg p-1 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
                 >
                   <X className="size-4" />
                 </button>
               </div>
 
-              <div className="rounded-xl border border-border/80 bg-[#FAF8F5] p-3 text-xs space-y-1">
-                <p className="font-bold text-foreground">{leadToManage.name}</p>
-                <p className="text-muted-foreground">{leadToManage.email} • {leadToManage.phone}</p>
-                {leadToManage.subject && (
-                  <p className="text-primary font-semibold truncate">Requirement: {leadToManage.subject}</p>
+              <div className="rounded-xl border border-border/70 bg-[#FAF8F5] p-3 text-xs space-y-1">
+                <p className="font-semibold text-foreground">{leadToDelete.name}</p>
+                <p className="text-muted-foreground">{leadToDelete.email} • {leadToDelete.phone}</p>
+                {leadToDelete.subject && (
+                  <p className="text-primary font-medium truncate">Requirement: {leadToDelete.subject}</p>
                 )}
               </div>
 
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Choose how you would like to handle this commercial enquiry:
+                Are you sure you want to permanently delete this enquiry? Once deleted, this commercial record cannot be recovered.
               </p>
 
-              <div className="space-y-2.5 pt-1">
-                {/* Option 1: Archive (Soft delete) */}
+              <div className="pt-3 border-t border-border/80 flex flex-wrap items-center justify-end gap-2">
                 <button
                   type="button"
                   disabled={deleteBusy}
-                  onClick={() => handleArchive(leadToManage.id, leadToManage.name)}
-                  className="w-full flex items-center justify-between rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 p-3.5 text-left transition-all cursor-pointer group"
-                >
-                  <div className="flex items-center gap-3">
-                    <Archive className="size-4 text-amber-700 shrink-0" />
-                    <div>
-                      <p className="text-xs font-bold text-amber-900">Archive Enquiry (Safe)</p>
-                      <p className="text-[11px] text-amber-800/80">Hides from active pipeline. Can be restored anytime.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs font-bold text-amber-700 group-hover:translate-x-0.5 transition-transform shrink-0">
-                    Archive →
-                  </span>
-                </button>
-
-                {/* Option 2: Permanent Delete (Hard delete) */}
-                <button
-                  type="button"
-                  disabled={deleteBusy}
-                  onClick={() => handlePermanentDelete(leadToManage.id, leadToManage.name)}
-                  className="w-full flex items-center justify-between rounded-xl border border-destructive/30 bg-destructive/5 hover:bg-destructive/15 p-3.5 text-left transition-all cursor-pointer group"
-                >
-                  <div className="flex items-center gap-3">
-                    <Trash2 className="size-4 text-destructive shrink-0" />
-                    <div>
-                      <p className="text-xs font-bold text-destructive">Permanently Delete</p>
-                      <p className="text-[11px] text-muted-foreground">Completely erases this lead from database. Cannot be undone.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs font-bold text-destructive group-hover:translate-x-0.5 transition-transform shrink-0">
-                    Delete →
-                  </span>
-                </button>
-              </div>
-
-              <div className="pt-2 border-t border-border flex justify-end">
-                <button
-                  type="button"
-                  disabled={deleteBusy}
-                  onClick={() => setLeadToManage(null)}
-                  className="rounded-xl border border-border px-4 py-2 text-xs font-semibold text-foreground hover:bg-secondary cursor-pointer"
+                  onClick={() => setLeadToDelete(null)}
+                  className="rounded-xl border border-border px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-secondary cursor-pointer transition-colors"
                 >
                   Cancel
+                </button>
+
+                {!viewArchived && (
+                  <button
+                    type="button"
+                    disabled={deleteBusy}
+                    onClick={() => handleArchive(leadToDelete.id, leadToDelete.name)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-[#DECDB3] bg-white px-3.5 py-2 text-xs font-semibold text-[#8C6D3B] hover:bg-[#FAF8F5] cursor-pointer transition-colors"
+                  >
+                    <Archive className="size-3.5" />
+                    <span>Archive Instead</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  disabled={deleteBusy}
+                  onClick={() => handlePermanentDelete(leadToDelete.id, leadToDelete.name)}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-destructive px-4 py-2 text-xs font-semibold text-white hover:bg-destructive/90 cursor-pointer transition-colors disabled:opacity-50"
+                >
+                  {deleteBusy ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="size-3.5" />
+                  )}
+                  <span>Permanently Delete</span>
                 </button>
               </div>
             </div>
