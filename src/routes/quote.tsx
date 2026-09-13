@@ -338,15 +338,10 @@ function QuotePage() {
         <section className="border-b border-border bg-gradient-to-b from-secondary/80 via-secondary/40 to-background py-14 lg:py-20">
           <div className="mx-auto max-w-7xl px-5 lg:px-8">
             <Reveal>
-              <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                   <Calculator className="size-3.5" />
                   <span>Official Enterprise RFQ Estimator</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                  <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Direct Mine Quota Active</span>
                 </div>
               </div>
 
@@ -622,7 +617,7 @@ function QuotePage() {
                           <div className="flex flex-wrap gap-1.5 border border-border p-1 bg-secondary/50 rounded-none text-xs">
                             {[
                               { id: "all", label: "All (13)" },
-                              { id: "flagship", label: "Own Mine" },
+                              { id: "flagship", label: "Flagship" },
                               { id: "dark", label: "Black & Dark" },
                               { id: "light", label: "White / Light" },
                               { id: "exotic", label: "Blue / Exotic" },

@@ -81,10 +81,7 @@ export function Header() {
                 className={linkBase}
                 activeProps={{ className: "text-primary font-semibold" }}
               >
-                <span className="flex items-center gap-1.5 font-medium text-primary">
-                  Leads
-                  <span className="inline-block size-1.5 rounded-full bg-primary animate-pulse" />
-                </span>
+                Leads
               </Link>
             )}
 
@@ -107,7 +104,7 @@ export function Header() {
                     type="button"
                     className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary transition-all hover:bg-primary/20 hover:border-primary/50 cursor-pointer"
                   >
-                    <span className="size-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50 animate-pulse" />
+                    <ShieldCheck className="size-3.5 text-primary" />
                     <span>Admin</span>
                     <ChevronDown className="size-3.5 opacity-70" />
                   </button>

@@ -4,6 +4,7 @@ import {
   ArrowRight,
   BadgeCheck,
   CheckCircle2,
+  ChevronDown,
   Gem,
   Globe2,
   Layers,
@@ -26,6 +27,7 @@ import { toast } from "sonner";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { Reveal } from "@/components/site/Reveal";
+import { GraniteVarietySelect, ProcessingTypeSelect } from "@/components/forms/EnquirySelects";
 import { useAuth } from "@/context/AuthContext";
 import { collection, flagship, products } from "@/lib/products";
 import { countryCodes } from "@/lib/country-codes";
@@ -759,19 +761,22 @@ function Contact() {
                       Phone / WhatsApp *
                     </label>
                     <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
-                      <select
-                        name="countryCode"
-                        value={countryCode}
-                        onChange={(e) => setCountryCode(e.target.value)}
-                        aria-label="Country code"
-                        className="border border-background/20 bg-ink px-2 py-3 text-sm text-background focus:border-primary focus:outline-none"
-                      >
-                        {countryCodes.map((c) => (
-                          <option key={c.code + c.label} value={c.code} className="bg-ink">
-                            {c.flag} {c.code}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="relative">
+                        <select
+                          name="countryCode"
+                          value={countryCode}
+                          onChange={(e) => setCountryCode(e.target.value)}
+                          aria-label="Country code"
+                          className="appearance-none h-full border border-background/20 bg-background/5 pl-3 pr-8 py-3 text-sm text-background focus:border-primary focus:outline-none transition-colors cursor-pointer rounded-none"
+                        >
+                          {countryCodes.map((c) => (
+                            <option key={c.code + c.label} value={c.code} className="bg-[#141519] text-white">
+                              {c.flag} {c.code}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 size-3 text-background/50" />
+                      </div>
                       <input
                         required
                         name="phone"
@@ -803,43 +808,15 @@ function Contact() {
 
                 {/* Granite Variety & Requirement Type */}
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-background/70">
-                      Granite Variety *
-                    </label>
-                    <select
-                      value={stoneVariety}
-                      onChange={(e) => setStoneVariety(e.target.value)}
-                      className="w-full border border-background/20 bg-ink px-4 py-3 text-sm text-background focus:border-primary focus:outline-none"
-                    >
-                      <option value="Black Galaxy (Captive Mine)">Black Galaxy (Own Mine - Flagship)</option>
-                      <option value="Steel Grey">Steel Grey</option>
-                      <option value="Black Pearl">Black Pearl</option>
-                      <option value="Tan Brown">Tan Brown</option>
-                      <option value="Absolute Black">Absolute Black</option>
-                      <option value="Viscont White">Viscont White</option>
-                      <option value="Colonial White">Colonial White</option>
-                      <option value="Other / Mixed Consignment">Other / Multi-variety Order</option>
-                    </select>
-                  </div>
+                  <GraniteVarietySelect
+                    value={stoneVariety}
+                    onChange={setStoneVariety}
+                  />
 
-                  <div>
-                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-background/70">
-                      Order / Processing Type
-                    </label>
-                    <select
-                      value={requirementType}
-                      onChange={(e) => setRequirementType(e.target.value)}
-                      className="w-full border border-background/20 bg-ink px-4 py-3 text-sm text-background focus:border-primary focus:outline-none"
-                    >
-                      <option value="Gang-saw Slabs (20mm / 30mm)">Gang-saw Polished Slabs (20mm/30mm)</option>
-                      <option value="Cutter Slabs">Cutter Slabs</option>
-                      <option value="Export Container Order (FOB/CIF)">Export Container Order (FOB/CIF)</option>
-                      <option value="Cut-to-Size / Commercial Project">Cut-to-Size / Commercial Project</option>
-                      <option value="Rough Blocks">Rough Blocks Direct from Mine</option>
-                      <option value="General Technical & Pricing Query">General Enquiry & Price List</option>
-                    </select>
-                  </div>
+                  <ProcessingTypeSelect
+                    value={requirementType}
+                    onChange={setRequirementType}
+                  />
                 </div>
 
                 {/* Estimated Quantity */}

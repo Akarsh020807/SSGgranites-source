@@ -194,17 +194,10 @@ function ContactPage() {
         <section className="relative border-b border-border bg-gradient-to-b from-secondary/80 via-secondary/40 to-background py-16 lg:py-24">
           <div className="mx-auto max-w-7xl px-5 lg:px-8">
             <Reveal>
-              <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                   <Mountain className="size-3.5" />
                   <span>Mine &amp; Plant Operations Headquarters</span>
-                </div>
-
-                <div className="flex items-center gap-2.5 rounded-full border border-border bg-background px-3.5 py-1 text-xs text-muted-foreground shadow-sm">
-                  <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="font-semibold text-foreground">Operational Now</span>
-                  <span className="opacity-40">•</span>
-                  <span>08:00 – 18:30 IST</span>
                 </div>
               </div>
 
